@@ -5,452 +5,184 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>إلى غيمتي.. من بحرٍ أدرك هدوءه</title>
   <meta name="description" content="رسالة من البحر إلى الغيم" />
-
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            burgundy: {
-              900: '#26050B',
-              800: '#3A0A12',
-              700: '#4D101A',
-              600: '#8C2D3B',
-            },
-            cream: {
-              100: '#FDFBF7',
-              200: '#F7F1E5',
-              300: '#EBE0CE',
-            },
+            burgundy: { 900:'#26050B', 800:'#3A0A12', 700:'#4D101A', 600:'#8C2D3B' },
+            cream: { 100:'#FDFBF7', 200:'#F7F1E5', 300:'#EBE0CE' },
           },
-          fontFamily: {
-            cairo: ['Cairo', 'sans-serif'],
-            amiri: ['Amiri', 'serif'],
-          },
+          fontFamily: { cairo:['Cairo','sans-serif'], amiri:['Amiri','serif'] },
         },
       },
     };
   </script>
-
   <style>
-    /* ===== BASE ===== */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; overflow-x: hidden; }
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: #3A0A12;
-      color: #FDFBF7;
-      line-height: 1.9;
-      overflow-x: hidden;
-      -webkit-tap-highlight-color: transparent;
-    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth;overflow-x:hidden}
+    body{font-family:'Cairo',sans-serif;background:#3A0A12;color:#FDFBF7;line-height:1.9;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+    #ripple-canvas{position:fixed;inset:0;z-index:9990;pointer-events:none;width:100%;height:100%}
+    .particle{position:absolute;border-radius:50%;background:rgba(253,251,247,0.15);pointer-events:none;animation:floatParticle linear infinite}
+    @keyframes floatParticle{0%{transform:translateY(0) scale(1);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) scale(0.3);opacity:0}}
+    .drift-cloud{position:absolute;opacity:0.06;pointer-events:none;will-change:transform;transition:transform .1s linear}
+    .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    .wave-divider{width:100%;overflow:hidden;line-height:0}
+    .wave-divider svg{display:block;width:100%;height:auto}
+    @keyframes waveShift1{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    @keyframes waveShift2{0%{transform:translateX(0)}100%{transform:translateX(50%)}}
+    .wave-anim-1{animation:waveShift1 12s linear infinite}
+    .wave-anim-2{animation:waveShift2 16s linear infinite}
+    .cloud-card{position:relative;background:#FDFBF7;color:#3A0A12;border-radius:30px 30px 50px 50px;padding:1.75rem 1.5rem;cursor:pointer;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease;box-shadow:0 8px 30px rgba(38,5,11,0.12)}
+    .cloud-card::before{content:'';position:absolute;top:-18px;right:20%;width:50px;height:36px;background:#FDFBF7;border-radius:50%}
+    .cloud-card::after{content:'';position:absolute;top:-12px;right:38%;width:36px;height:26px;background:#FDFBF7;border-radius:50%}
+    .cloud-card:hover,.cloud-card:active{transform:translateY(-6px) scale(1.02);box-shadow:0 14px 40px rgba(38,5,11,0.18)}
+    .timeline-line{position:absolute;right:50%;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,rgba(140,45,59,0.15),rgba(140,45,59,0.4),rgba(140,45,59,0.15));transform:translateX(50%)}
+    @media(max-width:640px){.timeline-line{right:24px;transform:none}}
+    .bottom-sheet-overlay{position:fixed;inset:0;z-index:10000;background:rgba(26,5,11,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .35s ease,visibility .35s ease}
+    .bottom-sheet-overlay.active{opacity:1;visibility:visible}
+    .bottom-sheet{position:fixed;bottom:0;left:0;right:0;z-index:10001;max-height:85vh;background:#FDFBF7;color:#3A0A12;border-radius:40px 40px 0 0;transform:translateY(100%);transition:transform .45s cubic-bezier(.22,1,.36,1);overflow-y:auto;padding:0 1.5rem 2.5rem;overscroll-behavior:contain}
+    .bottom-sheet.active{transform:translateY(0)}
+    .bottom-sheet-handle{width:48px;height:5px;border-radius:3px;background:#EBE0CE;margin:14px auto 20px}
+    .wave-card{background:rgba(253,251,247,0.08);border:1px solid rgba(253,251,247,0.12);border-radius:24px;padding:2rem 1.5rem;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:transform .3s ease,border-color .3s ease}
+    .wave-card:hover{transform:translateY(-4px);border-color:rgba(253,251,247,0.25)}
+    /* MUSIC PLAYER */
+    .music-player{position:fixed;top:16px;left:16px;z-index:9998;display:flex;align-items:center;gap:10px;padding:8px 16px 8px 10px;border-radius:40px;background:rgba(58,10,18,0.55);border:1px solid rgba(253,251,247,0.15);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:pointer;transition:all .35s ease;color:#FDFBF7;user-select:none;-webkit-user-select:none}
+    .music-player:hover{background:rgba(58,10,18,0.72);border-color:rgba(253,251,247,0.28)}
+    .music-player:active{transform:scale(0.97)}
+    .music-player-icon{width:34px;height:34px;border-radius:50%;background:rgba(253,251,247,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .3s ease}
+    .music-player.playing .music-player-icon{background:rgba(140,45,59,0.45)}
+    .music-player-note{display:inline-block;transition:transform .3s ease}
+    .music-player.playing .music-player-note{animation:noteWave 1.2s ease-in-out infinite}
+    @keyframes noteWave{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-12deg) scale(1.1)}50%{transform:rotate(0) scale(1)}75%{transform:rotate(12deg) scale(1.1)}}
+    .music-player-info{display:flex;flex-direction:column;line-height:1.3}
+    .music-player-title{font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:600;color:#FDFBF7;white-space:nowrap}
+    .music-player-status{font-family:'Cairo',sans-serif;font-size:.65rem;font-weight:400;color:rgba(253,251,247,0.45);white-space:nowrap;transition:color .3s ease}
+    .music-player.playing .music-player-status{color:rgba(253,251,247,0.65)}
+    .music-player.playing{animation:playerPulse 3s ease-in-out infinite;border-color:rgba(253,251,247,0.3)}
+    @keyframes playerPulse{0%,100%{box-shadow:0 0 0 0 rgba(140,45,59,0.25)}50%{box-shadow:0 0 0 8px rgba(140,45,59,0)}}
+    .music-bars{display:flex;align-items:flex-end;gap:2px;height:14px;margin-right:4px}
+    .music-bars span{display:block;width:2.5px;border-radius:2px;background:rgba(253,251,247,0.5);transition:height .15s ease}
+    .music-player:not(.playing) .music-bars span{height:3px!important}
+    .music-player.playing .music-bars span:nth-child(1){animation:barAnim .8s ease-in-out 0s infinite alternate}
+    .music-player.playing .music-bars span:nth-child(2){animation:barAnim .8s ease-in-out .2s infinite alternate}
+    .music-player.playing .music-bars span:nth-child(3){animation:barAnim .8s ease-in-out .4s infinite alternate}
+    @keyframes barAnim{0%{height:3px}100%{height:14px}}
+    /* FORM */
+    .form-textarea{width:100%;min-height:160px;resize:vertical;background:#F7F1E5;border:2px solid #EBE0CE;border-radius:16px;padding:1.25rem;font-family:'Amiri',serif;font-size:1.05rem;line-height:1.9;color:#3A0A12;direction:rtl;outline:none;transition:border-color .3s ease}
+    .form-textarea:focus{border-color:#8C2D3B}
+    .form-textarea::placeholder{color:#8C2D3B;opacity:.5}
+    .submit-btn{width:100%;padding:1rem;border:none;border-radius:16px;background:#3A0A12;color:#FDFBF7;font-family:'Cairo',sans-serif;font-size:1.05rem;font-weight:600;cursor:pointer;transition:all .3s ease}
+    .submit-btn:hover{background:#4D101A;transform:translateY(-2px)}
+    .submit-btn:active{transform:translateY(0)}
+    .wa-btn{display:block;width:100%;padding:1rem;border:2px solid #EBE0CE;border-radius:16px;background:transparent;color:#3A0A12;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:500;text-align:center;text-decoration:none;transition:all .3s ease}
+    .wa-btn:hover{background:#EBE0CE;transform:translateY(-2px)}
+    .success-msg{display:none;text-align:center;padding:1.5rem;background:rgba(140,45,59,0.08);border-radius:16px;font-family:'Amiri',serif;font-size:1.15rem;color:#3A0A12;margin-bottom:1rem}
+    .success-msg.show{display:block;animation:fadeInUp .5s ease}
+    .success-msg.hide{animation:fadeOutDown .35s ease forwards}
+    .write-again-btn{display:inline-block;margin-top:.75rem;padding:.5rem 1.25rem;border:1.5px solid #EBE0CE;border-radius:12px;background:transparent;color:#8C2D3B;font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:all .3s ease}
+    .write-again-btn:hover{background:#EBE0CE}
+    @keyframes fadeOutDown{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(10px)}}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .hero-art{max-width:260px;margin:0 auto}
+    .date-badge{display:inline-block;background:rgba(140,45,59,0.12);color:#8C2D3B;padding:.3rem 1rem;border-radius:20px;font-family:'Cairo',sans-serif;font-size:.8rem;font-weight:600}
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:rgba(140,45,59,0.3);border-radius:4px}
+    .apology-card{background:#FDFBF7;color:#3A0A12;border-radius:24px;padding:2rem 1.5rem;box-shadow:0 12px 50px rgba(26,5,11,0.2);font-family:'Amiri',serif;font-size:1.1rem;line-height:2.1}
+    @media(min-width:768px){.apology-card{padding:3rem 2.5rem;font-size:1.2rem}}
 
-    /* ===== RIPPLE CANVAS ===== */
-    #ripple-canvas {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      pointer-events: none;
-      width: 100%;
-      height: 100%;
-    }
+    /* ===== PRIVATE GATE ===== */
+    #private-gate{position:fixed;inset:0;z-index:99999;background:linear-gradient(180deg,#26050B 0%,#3A0A12 50%,#4D101A 100%);display:flex;align-items:center;justify-content:center;transition:opacity .7s ease,visibility .7s ease;overflow:hidden}
+    #private-gate.unlocked{opacity:0;pointer-events:none;visibility:hidden}
+    .gate-cloud{position:absolute;opacity:.06;pointer-events:none}
+    .gate-card{background:#FDFBF7;color:#3A0A12;border-radius:28px;padding:2.5rem 2rem;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(26,5,11,0.3);text-align:center;position:relative;z-index:2}
+    .gate-input{width:100%;padding:.9rem 1.2rem;border:2px solid #EBE0CE;border-radius:14px;background:#F7F1E5;font-family:'Cairo',sans-serif;font-size:1rem;color:#3A0A12;text-align:center;direction:rtl;outline:none;transition:border-color .3s ease}
+    .gate-input:focus{border-color:#8C2D3B}
+    .gate-input::placeholder{color:#8C2D3B;opacity:.4}
+    .gate-btn{width:100%;padding:.9rem;border:none;border-radius:14px;background:#3A0A12;color:#FDFBF7;font-family:'Cairo',sans-serif;font-size:1.05rem;font-weight:600;cursor:pointer;transition:all .3s ease;margin-top:.8rem}
+    .gate-btn:hover{background:#4D101A;transform:translateY(-2px)}
+    .gate-error{color:#8C2D3B;font-family:'Cairo',sans-serif;font-size:.85rem;margin-top:.6rem;min-height:1.4rem}
+    @keyframes gateWave{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-    /* ===== PARTICLES ===== */
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(253, 251, 247, 0.15);
-      pointer-events: none;
-      animation: floatParticle linear infinite;
-    }
-    @keyframes floatParticle {
-      0%   { transform: translateY(0) scale(1); opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 1; }
-      100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
-    }
+    /* ===== RESPONSE TOGGLE PILLS ===== */
+    .response-toggle{display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap}
+    .response-pill{flex:1;min-width:140px;padding:.7rem .8rem;border:2px solid #EBE0CE;border-radius:30px;background:transparent;color:#3A0A12;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .3s ease;text-align:center;user-select:none;-webkit-user-select:none}
+    .response-pill.active{background:#3A0A12;color:#FDFBF7;border-color:#3A0A12}
+    .response-pill:hover:not(.active){background:rgba(140,45,59,0.08)}
 
-    /* ===== DRIFTING CLOUDS ===== */
-    .drift-cloud {
-      position: absolute;
-      opacity: 0.06;
-      pointer-events: none;
-      will-change: transform;
-      transition: transform 0.1s linear;
-    }
+    /* ===== SECTION 5: SEA ECHO ===== */
+    .sea-letter-card{background:#FDFBF7;color:#3A0A12;border-radius:24px;padding:2rem 1.5rem;box-shadow:0 10px 40px rgba(26,5,11,0.12);font-family:'Amiri',serif;font-size:1.05rem;line-height:2.1;border:1px solid rgba(140,45,59,0.08);margin-bottom:1.5rem}
+    @media(min-width:768px){.sea-letter-card{padding:2.5rem 2rem;font-size:1.15rem}}
 
-    /* ===== SCROLL REVEAL ===== */
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    /* CLOUD-WAVE QA PAIRS */
+    .qa-pair{margin-bottom:1.5rem}
+    .qa-cloud{background:#FDFBF7;color:#3A0A12;border-radius:24px 24px 8px 24px;padding:1.25rem 1.5rem;box-shadow:0 6px 24px rgba(26,5,11,0.08);position:relative;font-family:'Amiri',serif;font-size:1rem;line-height:1.9}
+    .qa-cloud::before{content:'';position:absolute;top:-10px;right:18%;width:28px;height:20px;background:#FDFBF7;border-radius:50%}
+    .qa-cloud-label{font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:600;color:#8C2D3B;margin-bottom:.4rem}
+    .qa-wave{background:#3A0A12;color:#FDFBF7;border-radius:24px 24px 24px 8px;padding:1.25rem 1.5rem;box-shadow:0 6px 24px rgba(26,5,11,0.15);margin-top:.6rem;margin-right:1.5rem;font-family:'Amiri',serif;font-size:1rem;line-height:1.9}
+    .qa-wave-label{font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:600;color:rgba(253,251,247,0.5);margin-bottom:.4rem}
+    .qa-wave-pending{background:rgba(58,10,18,0.3);color:rgba(253,251,247,0.5);border-radius:16px;padding:.8rem 1.2rem;margin-top:.6rem;margin-right:1.5rem;font-family:'Cairo',sans-serif;font-size:.85rem;text-align:center;border:1px dashed rgba(253,251,247,0.15)}
+    .qa-timestamp{font-family:'Cairo',sans-serif;font-size:.7rem;color:rgba(140,45,59,0.4);margin-top:.3rem}
 
-    /* ===== WAVE DIVIDERS ===== */
-    .wave-divider { width: 100%; overflow: hidden; line-height: 0; }
-    .wave-divider svg { display: block; width: 100%; height: auto; }
-    .wave-divider.flip { transform: scaleY(-1); }
-
-    /* ===== ANIMATED WAVES ===== */
-    @keyframes waveShift1 { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    @keyframes waveShift2 { 0% { transform: translateX(0); } 100% { transform: translateX(50%); } }
-    .wave-anim-1 { animation: waveShift1 12s linear infinite; }
-    .wave-anim-2 { animation: waveShift2 16s linear infinite; }
-
-    /* ===== CLOUD CARDS ===== */
-    .cloud-card {
-      position: relative;
-      background: #FDFBF7;
-      color: #3A0A12;
-      border-radius: 30px 30px 50px 50px;
-      padding: 1.75rem 1.5rem;
-      cursor: pointer;
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
-      box-shadow: 0 8px 30px rgba(38, 5, 11, 0.12);
-    }
-    .cloud-card::before {
-      content: '';
-      position: absolute;
-      top: -18px;
-      right: 20%;
-      width: 50px;
-      height: 36px;
-      background: #FDFBF7;
-      border-radius: 50%;
-    }
-    .cloud-card::after {
-      content: '';
-      position: absolute;
-      top: -12px;
-      right: 38%;
-      width: 36px;
-      height: 26px;
-      background: #FDFBF7;
-      border-radius: 50%;
-    }
-    .cloud-card:hover, .cloud-card:active {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 14px 40px rgba(38, 5, 11, 0.18);
-    }
-
-    /* ===== TIMELINE ===== */
-    .timeline-line {
-      position: absolute;
-      right: 50%;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, rgba(140,45,59,0.15), rgba(140,45,59,0.4), rgba(140,45,59,0.15));
-      transform: translateX(50%);
-    }
-    @media (max-width: 640px) {
-      .timeline-line { right: 24px; transform: none; }
-    }
-
-    /* ===== BOTTOM SHEET ===== */
-    .bottom-sheet-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: rgba(26, 5, 11, 0.6);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.35s ease, visibility 0.35s ease;
-    }
-    .bottom-sheet-overlay.active { opacity: 1; visibility: visible; }
-
-    .bottom-sheet {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 10001;
-      max-height: 85vh;
-      background: #FDFBF7;
-      color: #3A0A12;
-      border-radius: 40px 40px 0 0;
-      transform: translateY(100%);
-      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-      overflow-y: auto;
-      padding: 0 1.5rem 2.5rem;
-      overscroll-behavior: contain;
-    }
-    .bottom-sheet.active { transform: translateY(0); }
-
-    .bottom-sheet-handle {
-      width: 48px;
-      height: 5px;
-      border-radius: 3px;
-      background: #EBE0CE;
-      margin: 14px auto 20px;
-    }
-
-    /* ===== WAVE CARDS (Section 3) ===== */
-    .wave-card {
-      background: rgba(253, 251, 247, 0.08);
-      border: 1px solid rgba(253, 251, 247, 0.12);
-      border-radius: 24px;
-      padding: 2rem 1.5rem;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      transition: transform 0.3s ease, border-color 0.3s ease;
-    }
-    .wave-card:hover { transform: translateY(-4px); border-color: rgba(253, 251, 247, 0.25); }
-
-    /* ===== MUSIC PLAYER WIDGET ===== */
-    .music-player {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      z-index: 9998;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 16px 8px 10px;
-      border-radius: 40px;
-      background: rgba(58, 10, 18, 0.55);
-      border: 1px solid rgba(253, 251, 247, 0.15);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      cursor: pointer;
-      transition: all 0.35s ease;
-      color: #FDFBF7;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .music-player:hover { background: rgba(58, 10, 18, 0.72); border-color: rgba(253, 251, 247, 0.28); }
-    .music-player:active { transform: scale(0.97); }
-
-    .music-player-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: rgba(253, 251, 247, 0.12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.3s ease;
-    }
-    .music-player.playing .music-player-icon { background: rgba(140, 45, 59, 0.45); }
-
-    .music-player-note {
-      display: inline-block;
-      transition: transform 0.3s ease;
-    }
-    .music-player.playing .music-player-note {
-      animation: noteWave 1.2s ease-in-out infinite;
-    }
-    @keyframes noteWave {
-      0%, 100% { transform: rotate(0deg) scale(1); }
-      25% { transform: rotate(-12deg) scale(1.1); }
-      50% { transform: rotate(0deg) scale(1); }
-      75% { transform: rotate(12deg) scale(1.1); }
-    }
-
-    .music-player-info {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.3;
-    }
-    .music-player-title {
-      font-family: 'Cairo', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #FDFBF7;
-      white-space: nowrap;
-    }
-    .music-player-status {
-      font-family: 'Cairo', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 400;
-      color: rgba(253, 251, 247, 0.45);
-      white-space: nowrap;
-      transition: color 0.3s ease;
-    }
-    .music-player.playing .music-player-status { color: rgba(253, 251, 247, 0.65); }
-
-    .music-player.playing {
-      animation: playerPulse 3s ease-in-out infinite;
-      border-color: rgba(253, 251, 247, 0.3);
-    }
-    @keyframes playerPulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(140, 45, 59, 0.25); }
-      50% { box-shadow: 0 0 0 8px rgba(140, 45, 59, 0); }
-    }
-
-    /* Bars animation (playing indicator) */
-    .music-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 2px;
-      height: 14px;
-      margin-right: 4px;
-    }
-    .music-bars span {
-      display: block;
-      width: 2.5px;
-      border-radius: 2px;
-      background: rgba(253, 251, 247, 0.5);
-      transition: height 0.15s ease;
-    }
-    .music-player:not(.playing) .music-bars span { height: 3px !important; }
-    .music-player.playing .music-bars span:nth-child(1) { animation: barAnim 0.8s ease-in-out 0s infinite alternate; }
-    .music-player.playing .music-bars span:nth-child(2) { animation: barAnim 0.8s ease-in-out 0.2s infinite alternate; }
-    .music-player.playing .music-bars span:nth-child(3) { animation: barAnim 0.8s ease-in-out 0.4s infinite alternate; }
-    @keyframes barAnim {
-      0% { height: 3px; }
-      100% { height: 14px; }
-    }
-
-    /* ===== FORM ===== */
-    .form-textarea {
-      width: 100%;
-      min-height: 160px;
-      resize: vertical;
-      background: #F7F1E5;
-      border: 2px solid #EBE0CE;
-      border-radius: 16px;
-      padding: 1.25rem;
-      font-family: 'Amiri', serif;
-      font-size: 1.05rem;
-      line-height: 1.9;
-      color: #3A0A12;
-      direction: rtl;
-      outline: none;
-      transition: border-color 0.3s ease;
-    }
-    .form-textarea:focus { border-color: #8C2D3B; }
-    .form-textarea::placeholder { color: #8C2D3B; opacity: 0.5; }
-
-    .submit-btn {
-      width: 100%;
-      padding: 1rem;
-      border: none;
-      border-radius: 16px;
-      background: #3A0A12;
-      color: #FDFBF7;
-      font-family: 'Cairo', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .submit-btn:hover { background: #4D101A; transform: translateY(-2px); }
-    .submit-btn:active { transform: translateY(0); }
-
-    .wa-btn {
-      display: block;
-      width: 100%;
-      padding: 1rem;
-      border: 2px solid #EBE0CE;
-      border-radius: 16px;
-      background: transparent;
-      color: #3A0A12;
-      font-family: 'Cairo', sans-serif;
-      font-size: 1rem;
-      font-weight: 500;
-      text-align: center;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-    .wa-btn:hover { background: #EBE0CE; transform: translateY(-2px); }
-
-    /* ===== SUCCESS MESSAGE ===== */
-    .success-msg {
-      display: none;
-      text-align: center;
-      padding: 1.5rem;
-      background: rgba(140, 45, 59, 0.08);
-      border-radius: 16px;
-      font-family: 'Amiri', serif;
-      font-size: 1.15rem;
-      color: #3A0A12;
-    }
-    .success-msg.show { display: block; animation: fadeInUp 0.5s ease; }
-    .success-msg.hide { animation: fadeOutDown 0.35s ease forwards; }
-
-    .write-again-btn {
-      display: inline-block;
-      margin-top: 0.75rem;
-      padding: 0.5rem 1.25rem;
-      border: 1.5px solid #EBE0CE;
-      border-radius: 12px;
-      background: transparent;
-      color: #8C2D3B;
-      font-family: 'Cairo', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .write-again-btn:hover { background: #EBE0CE; }
-
-    @keyframes fadeOutDown {
-      from { opacity: 1; transform: translateY(0); }
-      to { opacity: 0; transform: translateY(10px); display: none; }
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ===== HERO SVG ===== */
-    .hero-art { max-width: 260px; margin: 0 auto; }
-
-    /* ===== DATE BADGE ===== */
-    .date-badge {
-      display: inline-block;
-      background: rgba(140, 45, 59, 0.12);
-      color: #8C2D3B;
-      padding: 0.3rem 1rem;
-      border-radius: 20px;
-      font-family: 'Cairo', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(140, 45, 59, 0.3); border-radius: 4px; }
-
-    /* ===== APOLOGY CARD ===== */
-    .apology-card {
-      background: #FDFBF7;
-      color: #3A0A12;
-      border-radius: 24px;
-      padding: 2rem 1.5rem;
-      box-shadow: 0 12px 50px rgba(26, 5, 11, 0.2);
-      font-family: 'Amiri', serif;
-      font-size: 1.1rem;
-      line-height: 2.1;
-    }
-    @media (min-width: 768px) {
-      .apology-card { padding: 3rem 2.5rem; font-size: 1.2rem; }
-    }
+    /* ADMIN */
+    .admin-input{width:100%;padding:.8rem 1rem;border:2px solid #EBE0CE;border-radius:14px;background:#F7F1E5;font-family:'Amiri',serif;font-size:1rem;color:#3A0A12;direction:rtl;outline:none;transition:border-color .3s ease;margin-bottom:.6rem}
+    .admin-input:focus{border-color:#8C2D3B}
+    .admin-btn{padding:.7rem 1.5rem;border:none;border-radius:12px;background:#3A0A12;color:#FDFBF7;font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .3s ease}
+    .admin-btn:hover{background:#4D101A;transform:translateY(-1px)}
+    .admin-section{display:none;margin-top:1.5rem;padding:1.5rem;border:2px dashed rgba(140,45,59,0.2);border-radius:20px;background:rgba(140,45,59,0.03)}
+    .admin-section.visible{display:block;animation:fadeInUp .4s ease}
+    .admin-wave-input{width:100%;padding:.7rem 1rem;border:2px solid #EBE0CE;border-radius:12px;background:#F7F1E5;font-family:'Amiri',serif;font-size:.95rem;color:#3A0A12;direction:rtl;outline:none;min-height:80px;resize:vertical;margin-top:.5rem}
+    .admin-trigger{cursor:pointer;opacity:.3;transition:opacity .3s ease;display:inline-block}
+    .admin-trigger:hover{opacity:.7}
   </style>
 </head>
 
 <body>
+
+  <!-- ===== 1. PRIVATE ACCESS GATE (شاشة القفل السرية) ===== -->
+  <div id="private-gate">
+    <!-- Background drifting clouds in gate -->
+    <svg class="gate-cloud" style="top:10%;right:-40px;width:240px;" viewBox="0 0 200 80" fill="#FDFBF7">
+      <ellipse cx="70" cy="50" rx="60" ry="28"/><ellipse cx="120" cy="40" rx="50" ry="32"/><ellipse cx="50" cy="42" rx="40" ry="22"/>
+    </svg>
+    <svg class="gate-cloud" style="bottom:12%;left:-50px;width:220px;" viewBox="0 0 200 80" fill="#FDFBF7">
+      <ellipse cx="80" cy="48" rx="55" ry="26"/><ellipse cx="130" cy="38" rx="45" ry="28"/>
+    </svg>
+
+    <!-- Lock Card -->
+    <div class="gate-card">
+      <div style="font-size:2.8rem;margin-bottom:.5rem;animation:gateWave 3s ease-in-out infinite;">☁️🌊</div>
+      <h2 class="font-cairo font-bold text-xl md:text-2xl mb-2" style="color:#3A0A12;">
+        المكان ده معمول لغيمتي بس ☁️🤍
+      </h2>
+      <p class="font-cairo text-sm md:text-base mb-6" style="color:#8C2D3B;line-height:1.8;">
+        اكتبي تاريخ اليوم المميز (1/9) عشان يفتحلك عالمنا:
+      </p>
+
+      <form id="gate-form" onsubmit="event.preventDefault(); verifyGatePasscode();">
+        <input
+          type="password"
+          id="gate-passcode"
+          class="gate-input"
+          placeholder="كلمة السر أو التاريخ..."
+          autocomplete="off"
+          autofocus
+        />
+        <button type="submit" class="gate-btn">
+          افتحي البوابة 🤍
+        </button>
+      </form>
+
+      <div id="gate-error" class="gate-error"></div>
+    </div>
+  </div>
 
   <!-- ===== RIPPLE CANVAS ===== -->
   <canvas id="ripple-canvas"></canvas>
@@ -495,19 +227,16 @@
   <!-- SECTION 1: HERO & CORE APOLOGY             -->
   <!-- ═══════════════════════════════════════════ -->
   <section id="hero" class="relative min-h-screen flex flex-col items-center justify-center px-5 py-16 overflow-hidden" style="background: linear-gradient(180deg, #26050B 0%, #3A0A12 50%, #4D101A 100%);">
-
     <!-- Particles Container -->
     <div id="particles" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
 
     <!-- Hero Art: Cloud + Sea Wave SVG -->
     <div class="hero-art relative z-10 mb-8 reveal">
       <svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Cloud -->
         <ellipse cx="150" cy="55" rx="52" ry="28" fill="rgba(253,251,247,0.12)"/>
         <ellipse cx="110" cy="60" rx="35" ry="22" fill="rgba(253,251,247,0.1)"/>
         <ellipse cx="190" cy="58" rx="38" ry="24" fill="rgba(253,251,247,0.1)"/>
         <ellipse cx="150" cy="48" rx="30" ry="18" fill="rgba(253,251,247,0.15)"/>
-        <!-- Sea waves -->
         <path d="M20 130 Q60 110 100 130 Q140 150 180 130 Q220 110 260 130 Q280 140 300 130" stroke="rgba(253,251,247,0.2)" stroke-width="2" fill="none">
           <animate attributeName="d" dur="4s" repeatCount="indefinite"
             values="M20 130 Q60 110 100 130 Q140 150 180 130 Q220 110 260 130 Q280 140 300 130;
@@ -520,7 +249,6 @@
                     M10 145 Q55 162 100 145 Q145 128 190 145 Q235 162 280 145;
                     M10 145 Q55 128 100 145 Q145 162 190 145 Q235 128 280 145"/>
         </path>
-        <!-- Rain drops between cloud and sea -->
         <line x1="130" y1="80" x2="130" y2="105" stroke="rgba(253,251,247,0.12)" stroke-width="1.2" stroke-dasharray="4 6">
           <animate attributeName="y1" values="80;82;80" dur="2s" repeatCount="indefinite"/>
           <animate attributeName="y2" values="105;110;105" dur="2s" repeatCount="indefinite"/>
@@ -529,7 +257,7 @@
           <animate attributeName="y1" values="82;85;82" dur="2.5s" repeatCount="indefinite"/>
           <animate attributeName="y2" values="108;114;108" dur="2.5s" repeatCount="indefinite"/>
         </line>
-        <line x1="170" y1="78" x2="170" y2="102" stroke="rgba(253,251,247,0.08)" stroke-width="1" stroke-dasharray="5 5">
+        <line x1="170" y1="78" x2="170" y2="102" stroke="rgba(253,251,247,0.08)" stroke-width="5 5">
           <animate attributeName="y1" values="78;80;78" dur="3s" repeatCount="indefinite"/>
           <animate attributeName="y2" values="102;106;102" dur="3s" repeatCount="indefinite"/>
         </line>
@@ -550,21 +278,13 @@
     <div class="relative z-10 w-full max-w-2xl mx-auto reveal">
       <div class="apology-card">
         <p class="mb-6">أنا فعلاً شوفتك، وسمعتك، وفهمت كل كلمة قلتيها كويس جداً.. وقريت كل حرف بوجعه.</p>
-
         <p class="mb-6">أنا فعلاً عرفت غلطتي، وكنت أعمى وتسرعت في الحكم جداً.. وفي لحظة واحدة خرج مني كلام حسسك إنك بقيتي محتاجة تدافعي عن نفسك أو تثبتي براءتك قدامي، في الوقت اللي أنا كنت فيه الشخص الوحيد اللي المفروض تحسي معاه بأمان وما تحتاجيش تبرري له أي حاجة.</p>
-
         <p class="mb-6">أنا مش جاي أبرر اللي قلته، لأن مهما حصل مفيش أي مبرر في الدنيا يخليني أتصرف كده.. كل اللي صدر مني كان غباء وتسرع أعمى مني ملوش أي عذر مهما كانت الظروف.</p>
-
         <p class="mb-6">أنا لسه مستوعب بجد إن كلامك مكنش أبداً إنك 'توكسيك' أو بتأذيني، بالعكس تماماً.. ده كان صرخة استغاثة لإنسانة فضلت تستوعبني وتستحمل كبت وضغط كبير، وطبيعي جداً إنك تيجي في مرة وتنفجري وتطلعي كل اللي شلتيه جواكي.. وأنا للأسف مكنتش شايف غير نفسي واعتبرت ده هجوم، في حين إنك عمرك ما كنتي وحشة، ولا عمرك كنتي مؤذية، وعمرك ما هتبقي كده.</p>
-
         <p class="mb-6">معاكي كل الحق في كل اللي قلتيه عني.. أنا في أوقات كتير جداً كنت أناني، بضغط عليكي عشان مكالمة أو كلام حلو من غير حتى ما أسأل انتي طاقتك إيه أو تعبانة قد إيه.. والنقطة دي كانت بتتكرر كتير، وكنت بكون الحاجة اللي بتكسرك وتضغطك أكتر، بدل ما أكون الشخص اللي يحتويكي ويفهمك وقت ما تكون الدنيا صعبة.</p>
-
         <p class="mb-6">وفوق ده كله، أنا بعترف بعصبيتي الزايدة اللي كانت بتخوف بجد وقت الزعل وتهدد أمانك معايا، وتخليكي في قفص اتهام وتشككي في نفسك قدام أكتر حد المفروض واثق فيكي لأبعد حد وعارف نيتك ونقاءك من جوة.</p>
-
         <p class="mb-6">والمرادي أنا مش جاي آخدك على قد عقلك بكلمتين وأرجع بعدها بيومين زي الأول وأسوء.. أنا شفت عيوبي بوضوح واتعلمت من غلطي، وجاي بتأسفلك بجد ومن كل قلبي على كل تصرف وكل ضغط عملته.</p>
-
         <p>آخر حاجة عايزك تعرفيها، إني مش باعت الكلام ده ولا عامل الموقع عشان أقولك 'يلا نرجع وخلاص'.. زعلك ومساحتك حقك الكامل تاخديهم براحتك وعلى مهلك خالص بدون أي ضغط أو استعجال، ومش مستني منك رد فوري.. أنا بس كان يهمني إنك تعرفي إني سمعتك وفهمتك بجد.</p>
-
         <p class="mt-6" style="color: #8C2D3B;">وفي آخر الموقع خالص، هتلاقي مساحة معمولة عشانك انتي وبس، لو حابة تقولي أي حاجة فيها في أي وقت تحسيه مناسب.. القرار ليكي أولاً وأخيراً.</p>
       </div>
     </div>
@@ -583,12 +303,10 @@
     </svg>
   </div>
 
-
   <!-- ═══════════════════════════════════════════ -->
   <!-- SECTION 2: SKY OF MEMORIES                 -->
   <!-- ═══════════════════════════════════════════ -->
   <section id="memories" class="relative py-20 px-5" style="background: #F7F1E5;">
-
     <!-- Section Header -->
     <div class="text-center mb-16">
       <h2 class="text-2xl md:text-4xl font-bold font-cairo mb-3 reveal" style="color: #3A0A12;">
@@ -647,7 +365,6 @@
           <p class="font-cairo text-sm" style="color:#8C2D3B;">اضغطي عشان تقري الذكرى كاملة ☁️</p>
         </div>
       </div>
-
     </div>
   </section>
 
@@ -659,12 +376,10 @@
     </svg>
   </div>
 
-
   <!-- ═══════════════════════════════════════════ -->
   <!-- SECTION 3: SEA WAVES                       -->
   <!-- ═══════════════════════════════════════════ -->
   <section id="waves" class="relative py-20 px-5" style="background: #3A0A12;">
-
     <!-- Section Header -->
     <div class="text-center mb-14">
       <h2 class="text-2xl md:text-4xl font-bold font-cairo mb-3 reveal" style="color: #FDFBF7;">
@@ -677,7 +392,6 @@
 
     <!-- Wave Cards -->
     <div class="max-w-2xl mx-auto space-y-8">
-
       <!-- Wave 1 -->
       <div class="wave-card reveal">
         <h3 class="font-cairo font-bold text-xl mb-4 flex items-center gap-3" style="color: #FDFBF7;">
@@ -710,7 +424,6 @@
           صوتك بالنسبة لي مكنش مجرد صوت حد بحبه وخلاص.. ده الصوت اللي كان دايماً بيطمني ويزقني لقدام ويشجعني أكمل في أصعب أوقاتي. وضحكتك تحديداً كانت الحاجة الوحيدة اللي بتخليني أحس إني مبسوط بجد من قلبي، وإن في حاجة حلوة أنا نجحت أعملها في الدنيا.
         </p>
       </div>
-
     </div>
   </section>
 
@@ -721,12 +434,10 @@
     </svg>
   </div>
 
-
   <!-- ═══════════════════════════════════════════ -->
   <!-- SECTION 4: HER SAFE SPACE & CONTACT        -->
   <!-- ═══════════════════════════════════════════ -->
   <section id="safe-space" class="relative py-20 px-5" style="background: linear-gradient(180deg, #F7F1E5 0%, #EBE0CE 50%, #3A0A12 100%);">
-
     <!-- Section Header -->
     <div class="text-center mb-10">
       <h2 class="text-2xl md:text-4xl font-bold font-cairo mb-3 reveal" style="color: #3A0A12;">
@@ -737,7 +448,6 @@
     <!-- Safe Space Card -->
     <div class="max-w-lg mx-auto reveal">
       <div class="rounded-3xl p-6 md:p-8" style="background: #FDFBF7; box-shadow: 0 16px 60px rgba(26,5,11,0.15);">
-
         <!-- Intro Text -->
         <p class="font-amiri text-base md:text-lg mb-8" style="color: #3A0A12; line-height: 2;">
           المكان ده معمول عشانك. لو حابة تكتبي أي حاجة في قلبك وتوصلني على الإيميل من غير ما نضطر نفتح شات، اكتبيها هنا.. ولو حابة تتكلمي في أي وقت، هتلاقيني مستنيكي بهدوء ومن غير أي ضغط.
@@ -749,13 +459,35 @@
           <button type="button" class="write-again-btn" id="write-again-btn">كتابة رسالة أخرى ✍️</button>
         </div>
 
-        <!-- Email Form -->
+        <!-- Email Form with Option Toggles -->
         <form id="contact-form" class="mb-6">
-          <input type="hidden" name="_subject" value="رسالة من غيم ☁️" />
+          <input type="hidden" name="_subject" id="form-subject" value="🤍 [فضفضة - اسمعني بس] رسالة جديدة من غيم ☁️" />
           <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="حالة_الطلب" id="form-request-status" value="══════════ 🤍 الغيم بتفضفض وعايزاك تسمعها بس من غير رد 🤍 ══════════" />
+
+          <!-- Interactive Response Toggle Pills -->
+          <div class="response-toggle">
+            <button
+              type="button"
+              class="response-pill active"
+              id="pill-listen"
+              onclick="setResponseOption('listen')"
+            >
+              🎧 اسمعني بس (مش مستنية رد)
+            </button>
+            <button
+              type="button"
+              class="response-pill"
+              id="pill-reply"
+              onclick="setResponseOption('reply')"
+            >
+              💌 عايزاك ترد وتفهمني
+            </button>
+          </div>
 
           <textarea
             name="message"
+            id="contact-message"
             required
             class="form-textarea mb-4"
             placeholder="اكتبي كل اللي في قلبك هنا.. كلامك هيوصلني في سرية وأمان"
@@ -775,11 +507,118 @@
         <a href="mailto:kareemo20333@gmail.com?subject=رسالة من غيم ☁️" id="mailto-fallback" class="wa-btn mt-3 inline-block" style="display:none; border-color: #8C2D3B; color: #8C2D3B;">
           أو ابعتي إيميل مباشر من هنا ✉️
         </a>
-
       </div>
     </div>
   </section>
 
+  <!-- ===== WAVE DIVIDER: Cream/Burgundy → Deep Burgundy ===== -->
+  <div class="wave-divider" style="background:#26050B; margin-top:-1px;">
+    <svg viewBox="0 0 1440 100" preserveAspectRatio="none" style="width:200%;min-width:1440px;" class="wave-anim-2">
+      <path d="M0,40 C180,90 360,10 540,60 C720,100 900,20 1080,70 C1260,110 1440,30 1440,30 L1440,0 L0,0 Z" fill="#3A0A12"/>
+    </svg>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 5: SEA ECHO (صدى البحر والردود)     -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="sea-echo" class="relative py-20 px-5" style="background: linear-gradient(180deg, #26050B 0%, #3A0A12 60%, #26050B 100%);">
+    <div class="max-w-2xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center mb-14">
+        <h2 class="text-2xl md:text-4xl font-bold font-cairo mb-3 reveal" style="color: #FDFBF7;">
+          صدى البحر | رسائل وتوضيحات ليكي 🌊
+        </h2>
+        <p class="text-sm md:text-base font-cairo reveal" style="color: rgba(253,251,247,0.65); max-width: 520px; margin: 0 auto;">
+          هنا هرد على كل حاجة في قلبك، وهكتبلك كل الكلام والفضفضة اللي عايز أوصلهالك بهدوء
+        </p>
+      </div>
+
+      <!-- Sea Long-Form Letters Container -->
+      <div id="sea-letters-container" class="space-y-6 mb-16">
+        <!-- Rendered dynamically via StorageService -->
+      </div>
+
+      <!-- SUB-SECTION: CLOUD QUESTION & WAVE REPLY -->
+      <div class="mt-20 pt-10 border-t border-burgundy-700/50">
+        <div class="text-center mb-10">
+          <h3 class="text-xl md:text-3xl font-bold font-cairo mb-3 reveal" style="color: #FDFBF7;">
+            غيمة وموجة ☁️〰️🌊
+          </h3>
+          <p class="text-sm md:text-base font-cairo reveal" style="color: rgba(253,251,247,0.65); max-width: 500px; margin: 0 auto;">
+            لو في كلمة قولتها، أو حاجة حابة تفهميها بهدوء.. سيبيها هنا في غيمة، والبحر هيرد عليها في موجة 🤍
+          </p>
+        </div>
+
+        <!-- Her Input Box (ابعتي غيمة استفسار) -->
+        <div class="reveal mb-12">
+          <div class="rounded-3xl p-6" style="background: #FDFBF7; box-shadow: 0 12px 40px rgba(0,0,0,0.25);">
+            <div class="flex items-center gap-2 mb-3">
+              <span style="font-size: 1.4rem;">☁️</span>
+              <h4 class="font-cairo font-bold text-base" style="color: #3A0A12;">ابعتي غيمة استفسار</h4>
+            </div>
+            <textarea
+              id="cloud-question-input"
+              class="form-textarea mb-4"
+              style="min-height: 100px; font-size: 1rem;"
+              placeholder="اكتبي سؤالك أو الكلمة اللي محتاجة تفهميها بهدوء هنا..."
+            ></textarea>
+            <button
+              type="button"
+              onclick="submitCloudQuestion()"
+              id="submit-cloud-btn"
+              class="submit-btn"
+            >
+              ارسمي الغيمة هنا ☁️
+            </button>
+            <div id="cloud-feedback" class="mt-3 text-center text-sm font-cairo" style="color:#8C2D3B; display:none;"></div>
+          </div>
+        </div>
+
+        <!-- Paired Display Container -->
+        <div id="qa-pairs-container" class="space-y-8">
+          <!-- Rendered dynamically via StorageService -->
+        </div>
+
+        <!-- Secret Admin Controls Container (Unlocked via Admin PIN) -->
+        <div id="admin-panel" class="admin-section">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-cairo font-bold text-base text-cream-100 flex items-center gap-2">
+              <span>🌊</span> لوحة تحكم البحر (وضع المدير نشط)
+            </h4>
+            <button onclick="logoutAdmin()" class="text-xs font-cairo underline text-cream-200 opacity-70 hover:opacity-100">
+              تسجيل خروج
+            </button>
+          </div>
+
+          <!-- Add Sea Letter Form -->
+          <div class="mb-6 p-4 rounded-xl bg-burgundy-900/60 border border-burgundy-600/40">
+            <h5 class="font-cairo font-semibold text-sm text-cream-100 mb-3">➕ إضافة رسالة فضفضة جديدة في صدى البحر</h5>
+            <input
+              type="text"
+              id="admin-letter-title"
+              class="admin-input"
+              placeholder="عنوان الرسالة (مثلاً: كلام من قلبي ليكي)"
+            />
+            <input
+              type="text"
+              id="admin-letter-date"
+              class="admin-input"
+              placeholder="التاريخ (مثلاً: نوفمبر 2026)"
+            />
+            <textarea
+              id="admin-letter-content"
+              class="admin-input"
+              style="min-height: 120px;"
+              placeholder="اكتب رسالة البحر الطويلة هنا..."
+            ></textarea>
+            <button type="button" onclick="adminAddLetter()" class="admin-btn">
+              نشر رسالة البحر 🌊
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ═══════════════════════════════════════════ -->
   <!-- FOOTER                                     -->
@@ -791,10 +630,15 @@
     <div class="mt-6 flex items-center justify-center gap-2" style="color: rgba(253,251,247,0.2);">
       <i data-lucide="cloud" style="width:16px;height:16px;"></i>
       <span class="font-cairo text-xs">البحر والغيم</span>
-      <i data-lucide="waves" style="width:16px;height:16px;"></i>
+      <!-- Secret Admin Trigger Icon -->
+      <span
+        id="admin-trigger"
+        class="admin-trigger"
+        onclick="promptAdminLogin()"
+        title="البحر"
+      >🌊</span>
     </div>
   </footer>
-
 
   <!-- ═══════════════════════════════════════════ -->
   <!-- BOTTOM SHEET MODAL                         -->
@@ -810,11 +654,60 @@
     </button>
   </div>
 
-
   <!-- ═══════════════════════════════════════════ -->
   <!-- JAVASCRIPT                                 -->
   <!-- ═══════════════════════════════════════════ -->
   <script>
+  // ========================
+  // 1. ALLOWED PASSCODES & GATE LOGIC
+  // ========================
+  const ALLOWED_PASSCODES = [
+    "1/9/2025",
+    "01/09/2025",
+    "1-9-2025",
+    "01-09-2025",
+    "1/9",
+    "01/09",
+    "1092025",
+    "01092025"
+  ];
+
+  function normalizePasscode(str) {
+    if (!str) return "";
+    return str
+      .trim()
+      .toLowerCase()
+      .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)) // convert Arabic numerals if any
+      .replace(/\s+/g, "");
+  }
+
+  function verifyGatePasscode() {
+    const input = document.getElementById("gate-passcode");
+    const errorEl = document.getElementById("gate-error");
+    const val = normalizePasscode(input.value);
+
+    const isMatch = ALLOWED_PASSCODES.some(p => normalizePasscode(p) === val);
+
+    if (isMatch) {
+      localStorage.setItem("gheim_unlocked", "true");
+      const gate = document.getElementById("private-gate");
+      gate.classList.add("unlocked");
+      errorEl.textContent = "";
+    } else {
+      errorEl.textContent = "تاريخ مش مظبوط.. جربي تاريخ اليوم المميز (1/9) ☁️🤍";
+      input.classList.add("border-red-500");
+      setTimeout(() => input.classList.remove("border-red-500"), 1500);
+    }
+  }
+
+  // Check if previously unlocked
+  (function initGate() {
+    if (localStorage.getItem("gheim_unlocked") === "true") {
+      const gate = document.getElementById("private-gate");
+      if (gate) gate.classList.add("unlocked");
+    }
+  })();
+
   (function() {
     'use strict';
 
@@ -824,7 +717,7 @@
     lucide.createIcons();
 
     // ========================
-    // MEMORY DATA
+    // MEMORY DATA (5 Cards)
     // ========================
     const memories = [
       {
@@ -865,6 +758,7 @@
 
     window.openSheet = function(index) {
       const m = memories[index];
+      if (!m) return;
       sheetDate.textContent = m.date;
       sheetTitle.textContent = m.title;
       sheetContent.textContent = m.content;
@@ -879,12 +773,10 @@
       document.body.style.overflow = '';
     };
 
-    // Close on Escape
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeSheet();
     });
 
-    // Swipe-down to close bottom sheet
     let sheetTouchStartY = 0;
     sheet.addEventListener('touchstart', function(e) {
       sheetTouchStartY = e.touches[0].clientY;
@@ -895,7 +787,6 @@
         closeSheet();
       }
     }, { passive: true });
-
 
     // ========================
     // WATER RIPPLE EFFECT (Canvas)
@@ -930,7 +821,6 @@
         ctx.strokeStyle = 'rgba(253, 251, 247, ' + (r.opacity * 0.6) + ')';
         ctx.lineWidth = 1.5;
         ctx.stroke();
-        // inner softer ring
         if (r.radius > 10) {
           ctx.beginPath();
           ctx.arc(r.x, r.y, r.radius * 0.6, 0, Math.PI * 2);
@@ -943,7 +833,6 @@
     }
     drawRipples();
 
-    // Touch events
     let lastRippleTime = 0;
     function throttledRipple(x, y) {
       const now = Date.now();
@@ -965,7 +854,6 @@
       }
     }, { passive: true });
 
-    // Mouse events
     document.addEventListener('click', function(e) {
       addRipple(e.clientX, e.clientY);
     });
@@ -974,12 +862,12 @@
       throttledRipple(e.clientX, e.clientY);
     });
 
-
     // ========================
     // FLOATING PARTICLES (Hero)
     // ========================
     const particlesEl = document.getElementById('particles');
     function createParticles() {
+      if (!particlesEl) return;
       for (let i = 0; i < 30; i++) {
         const p = document.createElement('div');
         p.classList.add('particle');
@@ -995,13 +883,11 @@
     }
     createParticles();
 
-
     // ========================
     // DRIFTING CLOUDS (Parallax on Scroll)
     // ========================
     const driftClouds = document.querySelectorAll('.drift-cloud');
     const cloudSpeeds = [0.03, -0.02, 0.025, -0.018, 0.015];
-
     let scrollY = window.scrollY;
     let ticking = false;
 
@@ -1023,22 +909,23 @@
       }
     }, { passive: true });
 
-
     // ========================
     // SCROLL REVEAL (IntersectionObserver)
     // ========================
-    const revealEls = document.querySelectorAll('.reveal');
-    const revealObs = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          revealObs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    function setupScrollReveal() {
+      const revealEls = document.querySelectorAll('.reveal:not(.visible)');
+      const revealObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-    revealEls.forEach(function(el) { revealObs.observe(el); });
-
+      revealEls.forEach(function(el) { revealObs.observe(el); });
+    }
+    setupScrollReveal();
 
     // ========================
     // MUSIC PLAYER (HTML5 Audio + mobile autoplay)
@@ -1050,23 +937,24 @@
     let firstInteraction = true;
 
     function playMusic() {
+      if (!bgMusic) return;
       bgMusic.play().then(function() {
         isMusicPlaying = true;
-        musicPlayer.classList.add('playing');
-        playerStatus.textContent = 'يشتغل دلوقتي..';
+        if (musicPlayer) musicPlayer.classList.add('playing');
+        if (playerStatus) playerStatus.textContent = 'يشتغل دلوقتي..';
       }).catch(function() {
-        // Browser blocked autoplay — will retry on next tap
         isMusicPlaying = false;
-        musicPlayer.classList.remove('playing');
-        playerStatus.textContent = 'اضغطي للتشغيل';
+        if (musicPlayer) musicPlayer.classList.remove('playing');
+        if (playerStatus) playerStatus.textContent = 'اضغطي للتشغيل';
       });
     }
 
     function pauseMusic() {
+      if (!bgMusic) return;
       bgMusic.pause();
       isMusicPlaying = false;
-      musicPlayer.classList.remove('playing');
-      playerStatus.textContent = 'متوقف مؤقتاً';
+      if (musicPlayer) musicPlayer.classList.remove('playing');
+      if (playerStatus) playerStatus.textContent = 'متوقف مؤقتاً';
     }
 
     function toggleMusic() {
@@ -1078,13 +966,13 @@
       firstInteraction = false;
     }
 
-    // Player click/tap
-    musicPlayer.addEventListener('click', toggleMusic);
-    musicPlayer.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMusic(); }
-    });
+    if (musicPlayer) {
+      musicPlayer.addEventListener('click', toggleMusic);
+      musicPlayer.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMusic(); }
+      });
+    }
 
-    // Mobile autoplay: on first touch anywhere, start music if not already playing
     function handleFirstInteraction() {
       if (firstInteraction) {
         firstInteraction = false;
@@ -1094,77 +982,463 @@
       document.removeEventListener('click', handleFirstInteractionClick);
     }
     function handleFirstInteractionClick(e) {
-      // Avoid double-firing if the player itself was clicked (toggleMusic handles it)
-      if (musicPlayer.contains(e.target)) return;
+      if (musicPlayer && musicPlayer.contains(e.target)) return;
       handleFirstInteraction();
     }
     document.addEventListener('touchstart', handleFirstInteraction, { once: true, passive: true });
     document.addEventListener('click', handleFirstInteractionClick);
 
+    // ========================
+    // SECTION 4: TOGGLE PILLS & EMAIL FORM
+    // ========================
+    let currentResponseOption = 'listen'; // 'listen' or 'reply'
+    const pillListen = document.getElementById('pill-listen');
+    const pillReply = document.getElementById('pill-reply');
+    const formSubject = document.getElementById('form-subject');
+    const formRequestStatus = document.getElementById('form-request-status');
 
-    // ========================
-    // CONTACT FORM (FormSubmit AJAX — supports consecutive sends)
-    // ========================
+    window.setResponseOption = function(option) {
+      currentResponseOption = option;
+      if (option === 'reply') {
+        pillReply.classList.add('active');
+        pillListen.classList.remove('active');
+        formSubject.value = "⚠️ [مطلوب رد وتوضيح] رسالة جديدة من غيم ☁️";
+        formRequestStatus.value = "██████████ ⚠️ الغيم مستنية منك رد وتوضيح على الرسالة دي ⚠️ ██████████";
+      } else {
+        pillListen.classList.add('active');
+        pillReply.classList.remove('active');
+        formSubject.value = "🤍 [فضفضة - اسمعني بس] رسالة جديدة من غيم ☁️";
+        formRequestStatus.value = "══════════ 🤍 الغيم بتفضفض وعايزاك تسمعها بس من غير رد 🤍 ══════════";
+      }
+    };
+
     const form = document.getElementById('contact-form');
     const submitBtn = document.getElementById('submit-btn');
     const successMsg = document.getElementById('success-msg');
     const writeAgainBtn = document.getElementById('write-again-btn');
     const mailtoFallback = document.getElementById('mailto-fallback');
-    const messageTextarea = form.querySelector('textarea[name="message"]');
+    const messageTextarea = document.getElementById('contact-message');
     const submitBtnOriginalText = 'ابعتي الرسالة بهدوء ✉️';
 
-    // Dismiss notice & refocus textarea
     function dismissNotice() {
       successMsg.classList.remove('show');
       successMsg.classList.add('hide');
       setTimeout(function() {
         successMsg.classList.remove('hide');
-        // reset display to none (CSS default)
         successMsg.style.display = '';
       }, 350);
-      messageTextarea.focus();
+      if (messageTextarea) messageTextarea.focus();
     }
 
-    writeAgainBtn.addEventListener('click', dismissNotice);
+    if (writeAgainBtn) {
+      writeAgainBtn.addEventListener('click', dismissNotice);
+    }
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const messageVal = messageTextarea.value.trim();
-      if (!messageVal) return;
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const messageVal = messageTextarea.value.trim();
+        if (!messageVal) return;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'جاري الإرسال...';
+
+        const formData = new FormData(form);
+
+        fetch('https://formsubmit.co/ajax/kareemo20333@gmail.com', {
+          method: 'POST',
+          body: formData,
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.success) {
+            messageTextarea.value = '';
+            submitBtn.disabled = false;
+            submitBtn.textContent = submitBtnOriginalText;
+            successMsg.classList.remove('hide');
+            successMsg.classList.add('show');
+          } else {
+            throw new Error('Form submission failed');
+          }
+        })
+        .catch(function() {
+          submitBtn.textContent = 'حصل مشكلة.. جربي الطريقة التانية ⬇️';
+          submitBtn.disabled = false;
+          mailtoFallback.style.display = 'block';
+          const encoded = encodeURIComponent(messageVal);
+          mailtoFallback.href = 'mailto:kareemo20333@gmail.com?subject=' + encodeURIComponent(formSubject.value) + '&body=' + encoded;
+        });
+      });
+    }
+
+    // ==========================================
+    // STORAGE SERVICE (Cloud Database Readiness)
+    // Uses localStorage as instant local fallback,
+    // structured with async methods for Firebase Firestore.
+    // ==========================================
+    const StorageService = {
+      KEY: 'gheim_cloud_wave_db',
+
+      // Default Seed Data (Clean empty state)
+      getDefaultData: function() {
+        return {
+          letters: [],
+          qas: []
+        };
+      },
+
+      // Async getter
+      getItems: async function() {
+        try {
+          const raw = localStorage.getItem(this.KEY);
+          if (!raw) {
+            const seed = this.getDefaultData();
+            localStorage.setItem(this.KEY, JSON.stringify(seed));
+            return seed;
+          }
+          let parsed = JSON.parse(raw);
+          // Clean up any legacy placeholder sample data
+          if (Array.isArray(parsed.letters)) {
+            parsed.letters = parsed.letters.filter(l => l.id !== 'letter_1');
+          } else {
+            parsed.letters = [];
+          }
+          if (Array.isArray(parsed.qas)) {
+            parsed.qas = parsed.qas.filter(q => q.id !== 'qa_demo_1');
+          } else {
+            parsed.qas = [];
+          }
+          return parsed;
+        } catch (e) {
+          console.error("StorageService getItems error:", e);
+          return this.getDefaultData();
+        }
+      },
+
+      // Save helper
+      saveItems: async function(data) {
+        try {
+          localStorage.setItem(this.KEY, JSON.stringify(data));
+          return true;
+        } catch (e) {
+          console.error("StorageService saveItems error:", e);
+          return false;
+        }
+      },
+
+      // Add a cloud question from her
+      addCloud: async function(questionText) {
+        const data = await this.getItems();
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric', day: 'numeric' });
+        const newQA = {
+          id: 'qa_' + Date.now(),
+          timestamp: formattedDate,
+          question: questionText,
+          reply: '',
+          answered: false
+        };
+        data.qas.unshift(newQA); // newer first
+        await this.saveItems(data);
+        return newQA;
+      },
+
+      // Add or update a wave reply from him (Admin)
+      addWaveReply: async function(qaId, replyText) {
+        const data = await this.getItems();
+        const item = data.qas.find(q => q.id === qaId);
+        if (item) {
+          item.reply = replyText;
+          item.answered = true;
+          await this.saveItems(data);
+          return true;
+        }
+        return false;
+      },
+
+      // Add a new Sea Letter (Admin)
+      addSeaLetter: async function(title, content, date) {
+        const data = await this.getItems();
+        const newLetter = {
+          id: 'letter_' + Date.now(),
+          title: title || 'رسالة من البحر',
+          date: date || 'اليوم',
+          content: content
+        };
+        data.letters.unshift(newLetter);
+        await this.saveItems(data);
+        return newLetter;
+      }
+    };
+
+    // ==========================================
+    // RENDER: SEA LETTERS & QA PAIRS
+    // ==========================================
+    let isAdminLoggedIn = (sessionStorage.getItem('sea_admin_active') === 'true');
+
+    async function renderSeaLetters() {
+      const container = document.getElementById('sea-letters-container');
+      if (!container) return;
+      const data = await StorageService.getItems();
+
+      if (!data.letters || data.letters.length === 0) {
+        container.innerHTML = `
+          <div class="text-center p-8 rounded-2xl bg-burgundy-900/40 border border-burgundy-700/30 reveal visible">
+            <p class="font-amiri text-cream-200 text-lg opacity-80">مساحة هادية مخصصة لرسائل البحر القادمة.. 🌊</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = data.letters.map(letter => `
+        <div class="sea-letter-card reveal visible">
+          <div class="flex items-center justify-between mb-4">
+            <span class="date-badge">${escapeHtml(letter.date)}</span>
+            <span class="text-xs font-cairo text-burgundy-600 opacity-70">رسالة بحر 🌊</span>
+          </div>
+          <h3 class="font-cairo font-bold text-lg md:text-xl mb-4" style="color: #3A0A12;">
+            ${escapeHtml(letter.title)}
+          </h3>
+          <p class="font-amiri text-base md:text-lg leading-loose" style="color: #3A0A12; white-space: pre-line;">
+            ${escapeHtml(letter.content)}
+          </p>
+        </div>
+      `).join('');
+    }
+
+    async function renderQAPairs() {
+      const container = document.getElementById('qa-pairs-container');
+      if (!container) return;
+      const data = await StorageService.getItems();
+
+      if (!data.qas || data.qas.length === 0) {
+        container.innerHTML = `
+          <div class="text-center p-8 rounded-2xl bg-burgundy-900/40 border border-burgundy-700/30 reveal visible">
+            <p class="font-amiri text-cream-200 text-lg mb-2">المكان ده مستني أول غيمة منكِ ☁️</p>
+            <p class="font-cairo text-xs text-cream-300 opacity-60">أي حاجة حابة تفهميها بهدوء سيبيها فوق، وهتظهر هنا علطول 🤍</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = data.qas.map(qa => {
+        const waveHtml = qa.answered && qa.reply
+          ? `
+            <div class="qa-wave">
+              <div class="qa-wave-label">موجة البحر 🌊</div>
+              <p class="text-cream-100 font-amiri text-base" style="white-space: pre-line;">
+                ${escapeHtml(qa.reply)}
+              </p>
+            </div>
+          `
+          : `
+            <div class="qa-wave-pending">
+              🌊 البحر بيجهز موجته للرد...
+            </div>
+          `;
+
+        const adminReplyBox = isAdminLoggedIn
+          ? `
+            <div class="mt-3 p-3 rounded-xl bg-burgundy-900/70 border border-cream-300/20">
+              <p class="text-xs font-cairo text-cream-200 mb-1">✍️ اكتب موجة الرد على الغيمة دي:</p>
+              <textarea
+                id="reply-input-${qa.id}"
+                class="admin-wave-input"
+                placeholder="اكتب رد البحر هنا..."
+              >${escapeHtml(qa.reply || '')}</textarea>
+              <button
+                type="button"
+                onclick="adminSaveReply('${qa.id}')"
+                class="admin-btn mt-2 text-xs"
+              >
+                حفظ موجة الرد 🌊
+              </button>
+            </div>
+          `
+          : '';
+
+        return `
+          <div class="qa-pair reveal visible">
+            <!-- Her Cloud Bubble -->
+            <div class="qa-cloud">
+              <div class="flex items-center justify-between">
+                <span class="qa-cloud-label">غيمة منكِ ☁️</span>
+                <span class="qa-timestamp">${escapeHtml(qa.timestamp || '')}</span>
+              </div>
+              <p class="font-amiri text-base md:text-lg" style="color:#3A0A12; white-space: pre-line;">
+                ${escapeHtml(qa.question)}
+              </p>
+            </div>
+
+            <!-- His Wave Bubble (or Pending) -->
+            ${waveHtml}
+
+            <!-- Admin Reply Box (if logged in) -->
+            ${adminReplyBox}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // ==========================================
+    // HER SUBMISSION: CLOUD QUESTION
+    // ==========================================
+    window.submitCloudQuestion = async function() {
+      const input = document.getElementById('cloud-question-input');
+      const feedback = document.getElementById('cloud-feedback');
+      const submitBtn = document.getElementById('submit-cloud-btn');
+      const text = input ? input.value.trim() : '';
+
+      if (!text) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.textContent = 'اكتبي أي كلمة أو سؤال عشان ترسمي الغيمة ☁️';
+        }
+        return;
+      }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = 'جاري الإرسال...';
+      submitBtn.textContent = 'جاري رسم الغيمة... ☁️';
 
-      const formData = new FormData(form);
+      // 1. Add locally via StorageService
+      await StorageService.addCloud(text);
+      await renderQAPairs();
 
-      fetch('https://formsubmit.co/ajax/kareemo20333@gmail.com', {
-        method: 'POST',
-        body: formData,
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        if (data.success) {
-          // Clear textarea, re-enable button, show confirmation above form
-          messageTextarea.value = '';
-          submitBtn.disabled = false;
-          submitBtn.textContent = submitBtnOriginalText;
-          successMsg.classList.remove('hide');
-          successMsg.classList.add('show');
-        } else {
-          throw new Error('Form submission failed');
+      // Clear input
+      input.value = '';
+
+      // 2. Silent alert to FormSubmit without including her question text
+      try {
+        const alertForm = new FormData();
+        alertForm.append('_subject', '☁️ تنبيه: غيمة جديدة ظهرت في الموقع!');
+        alertForm.append('_captcha', 'false');
+        alertForm.append('التنبيه', 'في غيمة جديدة ظهرت في قسم (صدى البحر) على الموقع.. ادخل شوفها ورد عليها بموجة 🌊');
+
+        fetch('https://formsubmit.co/ajax/kareemo20333@gmail.com', {
+          method: 'POST',
+          body: alertForm
+        }).catch(err => console.log('Silent alert background dispatched'));
+      } catch (e) {
+        // silent
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'ارسمي الغيمة هنا ☁️';
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.textContent = 'اتسجلت غيمتك بنقاء.. والبحر هيجهز موجته للرد 🤍';
+        setTimeout(() => { feedback.style.display = 'none'; }, 5000);
+      }
+    };
+
+    // ==========================================
+    // ADMIN MODE (وضع البحر)
+    // ==========================================
+    const ADMIN_ACCEPTED_PASSCODES = [
+      "25/02/2026",
+      "25/2/2026",
+      "25-02-2026",
+      "25-2-2026",
+      "25022026"
+    ];
+
+    const adminPanel = document.getElementById('admin-panel');
+
+    function updateAdminUI() {
+      if (isAdminLoggedIn) {
+        if (adminPanel) adminPanel.classList.add('visible');
+      } else {
+        if (adminPanel) adminPanel.classList.remove('visible');
+      }
+      renderQAPairs();
+    }
+
+    window.promptAdminLogin = function() {
+      if (isAdminLoggedIn) {
+        const panel = document.getElementById('admin-panel');
+        if (panel) {
+          panel.scrollIntoView({ behavior: 'smooth' });
         }
-      })
-      .catch(function() {
-        // Show mailto fallback
-        submitBtn.textContent = 'حصل مشكلة.. جربي الطريقة التانية ⬇️';
-        submitBtn.disabled = false;
-        mailtoFallback.style.display = 'block';
-        // Pre-fill mailto
-        const encoded = encodeURIComponent(messageVal);
-        mailtoFallback.href = 'mailto:kareemo20333@gmail.com?subject=' + encodeURIComponent('رسالة من غيم ☁️') + '&body=' + encoded;
-      });
-    });
+        alert('أنت بالفعل داخل وضع المدير (البحر) 🌊');
+        return;
+      }
+      const pin = prompt('أدخل رمز البحر السري:');
+      if (pin !== null) {
+        const normalizedInput = normalizePasscode(pin);
+        const isMatch = ADMIN_ACCEPTED_PASSCODES.some(p => normalizePasscode(p) === normalizedInput);
+        if (isMatch) {
+          sessionStorage.setItem('sea_admin_active', 'true');
+          isAdminLoggedIn = true;
+          updateAdminUI();
+          const panel = document.getElementById('admin-panel');
+          if (panel) {
+            setTimeout(() => panel.scrollIntoView({ behavior: 'smooth' }), 200);
+          }
+          alert('أهلاً بك يا بحر.. تم تفعيل وضع الردود 🌊');
+        } else {
+          alert('رمز غير صحيح');
+        }
+      }
+    };
 
+    window.logoutAdmin = function() {
+      sessionStorage.removeItem('sea_admin_active');
+      isAdminLoggedIn = false;
+      updateAdminUI();
+    };
+
+    window.adminAddLetter = async function() {
+      const titleInput = document.getElementById('admin-letter-title');
+      const dateInput = document.getElementById('admin-letter-date');
+      const contentInput = document.getElementById('admin-letter-content');
+
+      const title = titleInput.value.trim();
+      const date = dateInput.value.trim();
+      const content = contentInput.value.trim();
+
+      if (!content) {
+        alert('اكتب محتوى الرسالة أولاً');
+        return;
+      }
+
+      await StorageService.addSeaLetter(title, content, date);
+      titleInput.value = '';
+      dateInput.value = '';
+      contentInput.value = '';
+
+      await renderSeaLetters();
+      alert('تم نشر رسالة البحر بنجاح 🌊');
+    };
+
+    window.adminSaveReply = async function(qaId) {
+      const input = document.getElementById(`reply-input-${qaId}`);
+      if (!input) return;
+      const text = input.value.trim();
+
+      if (!text) {
+        alert('اكتب الرد قبل الحفظ');
+        return;
+      }
+
+      await StorageService.addWaveReply(qaId, text);
+      await renderQAPairs();
+      alert('تم حفظ موجة الرد 🌊');
+    };
+
+    // Initial render of dynamic data
+    renderSeaLetters();
+    renderQAPairs();
+    updateAdminUI();
 
   })();
   </script>
