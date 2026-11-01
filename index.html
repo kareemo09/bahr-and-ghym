@@ -184,6 +184,25 @@
     </div>
   </div>
 
+  <script>
+    // Immediate Gate Check to prevent any visual flicker on reload
+    (function() {
+      const unlockTime = localStorage.getItem('gheim_unlock_time');
+      const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+      if (localStorage.getItem('gheim_unlocked')) {
+        localStorage.removeItem('gheim_unlocked');
+      }
+      if (unlockTime && (Date.now() - parseInt(unlockTime, 10)) < TWENTY_FOUR_HOURS) {
+        const gate = document.getElementById('private-gate');
+        if (gate) gate.classList.add('hidden', 'pointer-events-none', 'unlocked');
+      } else {
+        localStorage.removeItem('gheim_unlock_time');
+        const gate = document.getElementById('private-gate');
+        if (gate) gate.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'unlocked');
+      }
+    })();
+  </script>
+
   <!-- ===== RIPPLE CANVAS ===== -->
   <canvas id="ripple-canvas"></canvas>
 
@@ -689,9 +708,17 @@
     const isMatch = ALLOWED_PASSCODES.some(p => normalizePasscode(p) === val);
 
     if (isMatch) {
-      localStorage.setItem("gheim_unlocked", "true");
+      localStorage.setItem("gheim_unlock_time", Date.now().toString());
+      if (localStorage.getItem("gheim_unlocked")) {
+        localStorage.removeItem("gheim_unlocked");
+      }
       const gate = document.getElementById("private-gate");
-      gate.classList.add("unlocked");
+      if (gate) {
+        gate.classList.add("unlocked", "opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          gate.classList.add("hidden");
+        }, 700);
+      }
       errorEl.textContent = "";
     } else {
       errorEl.textContent = "تاريخ مش مظبوط.. جربي تاريخ اليوم المميز (1/9) ☁️🤍";
@@ -700,11 +727,25 @@
     }
   }
 
-  // Check if previously unlocked
+  // Check 24-hour expiration on page load
   (function initGate() {
-    if (localStorage.getItem("gheim_unlocked") === "true") {
-      const gate = document.getElementById("private-gate");
-      if (gate) gate.classList.add("unlocked");
+    const unlockTime = localStorage.getItem('gheim_unlock_time');
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
+    // Also clear any legacy keys like 'gheim_unlocked' to force the lock screen on next visit
+    if (localStorage.getItem('gheim_unlocked')) {
+      localStorage.removeItem('gheim_unlocked');
+    }
+
+    if (unlockTime && (Date.now() - parseInt(unlockTime, 10)) < TWENTY_FOUR_HOURS) {
+      // Still valid within 24 hours -> hide gate
+      const gate = document.getElementById('private-gate');
+      if (gate) gate.classList.add('hidden', 'pointer-events-none', 'unlocked');
+    } else {
+      // Expired or first time -> remove expired key and ensure gate is visible
+      localStorage.removeItem('gheim_unlock_time');
+      const gate = document.getElementById('private-gate');
+      if (gate) gate.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'unlocked');
     }
   })();
 
