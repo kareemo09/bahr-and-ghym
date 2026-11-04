@@ -1,1529 +1,2334 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>إلى غيمتي.. من بحرٍ أدرك هدوءه</title>
-  <meta name="description" content="رسالة من البحر إلى الغيم" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>إلى غيمتي.. من بحرٍ أدرك هدوءه ☁️🌊</title>
+  
+  <!-- Google Fonts: Cairo (UI) & Amiri (Emotional letters & narrative) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            burgundy: { 900:'#26050B', 800:'#3A0A12', 700:'#4D101A', 600:'#8C2D3B' },
-            cream: { 100:'#FDFBF7', 200:'#F7F1E5', 300:'#EBE0CE' },
+            burgundy: {
+              950: '#1A0307',
+              900: '#26050B', // Primary Royal Burgundy
+              850: '#30080E',
+              800: '#3A0A12', // Warm Deep Burgundy
+              700: '#4D101A',
+              600: '#681724',
+              500: '#8C2D3B', // Accent Burgundy
+              400: '#B03E50',
+              300: '#D46C7E',
+            },
+            cream: {
+              50: '#FFFFFF',
+              100: '#FDFBF7', // Ultra Soft Off-White
+              200: '#F7F1E5', // Warm Cream
+              300: '#EBE0CE', // Soft Beige
+              400: '#D9C8B0',
+              500: '#BAA283',
+            }
           },
-          fontFamily: { cairo:['Cairo','sans-serif'], amiri:['Amiri','serif'] },
-        },
-      },
-    };
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+            amiri: ['Amiri', 'serif'],
+          },
+          animation: {
+            'float-slow': 'float 7s ease-in-out infinite',
+            'float-delayed': 'float 8s ease-in-out 3s infinite',
+            'pulse-subtle': 'pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow-wave': 'glowWave 2.5s ease-in-out infinite alternate',
+            'wave-drift': 'waveDrift 12s ease-in-out infinite alternate',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            },
+            pulseSubtle: {
+              '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+              '50%': { opacity: '0.85', transform: 'scale(1.02)' },
+            },
+            glowWave: {
+              '0%': { filter: 'drop-shadow(0 0 4px rgba(253, 251, 247, 0.3))' },
+              '100%': { filter: 'drop-shadow(0 0 16px rgba(253, 251, 247, 0.8))' },
+            },
+            waveDrift: {
+              '0%': { transform: 'translateX(0)' },
+              '100%': { transform: 'translateX(20px)' },
+            }
+          }
+        }
+      }
+    }
   </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Firebase Compat SDK v10.12.0 -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    html{scroll-behavior:smooth;overflow-x:hidden}
-    body{font-family:'Cairo',sans-serif;background:#3A0A12;color:#FDFBF7;line-height:1.9;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
-    #ripple-canvas{position:fixed;inset:0;z-index:9990;pointer-events:none;width:100%;height:100%}
-    .particle{position:absolute;border-radius:50%;background:rgba(253,251,247,0.15);pointer-events:none;animation:floatParticle linear infinite}
-    @keyframes floatParticle{0%{transform:translateY(0) scale(1);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) scale(0.3);opacity:0}}
-    .drift-cloud{position:absolute;opacity:0.06;pointer-events:none;will-change:transform;transition:transform .1s linear}
-    .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
-    .reveal.visible{opacity:1;transform:translateY(0)}
-    .wave-divider{width:100%;overflow:hidden;line-height:0}
-    .wave-divider svg{display:block;width:100%;height:auto}
-    @keyframes waveShift1{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-    @keyframes waveShift2{0%{transform:translateX(0)}100%{transform:translateX(50%)}}
-    .wave-anim-1{animation:waveShift1 12s linear infinite}
-    .wave-anim-2{animation:waveShift2 16s linear infinite}
-    .cloud-card{position:relative;background:#FDFBF7;color:#3A0A12;border-radius:30px 30px 50px 50px;padding:1.75rem 1.5rem;cursor:pointer;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease;box-shadow:0 8px 30px rgba(38,5,11,0.12)}
-    .cloud-card::before{content:'';position:absolute;top:-18px;right:20%;width:50px;height:36px;background:#FDFBF7;border-radius:50%}
-    .cloud-card::after{content:'';position:absolute;top:-12px;right:38%;width:36px;height:26px;background:#FDFBF7;border-radius:50%}
-    .cloud-card:hover,.cloud-card:active{transform:translateY(-6px) scale(1.02);box-shadow:0 14px 40px rgba(38,5,11,0.18)}
-    .timeline-line{position:absolute;right:50%;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,rgba(140,45,59,0.15),rgba(140,45,59,0.4),rgba(140,45,59,0.15));transform:translateX(50%)}
-    @media(max-width:640px){.timeline-line{right:24px;transform:none}}
-    .bottom-sheet-overlay{position:fixed;inset:0;z-index:10000;background:rgba(26,5,11,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .35s ease,visibility .35s ease}
-    .bottom-sheet-overlay.active{opacity:1;visibility:visible}
-    .bottom-sheet{position:fixed;bottom:0;left:0;right:0;z-index:10001;max-height:85vh;background:#FDFBF7;color:#3A0A12;border-radius:40px 40px 0 0;transform:translateY(100%);transition:transform .45s cubic-bezier(.22,1,.36,1);overflow-y:auto;padding:0 1.5rem 2.5rem;overscroll-behavior:contain}
-    .bottom-sheet.active{transform:translateY(0)}
-    .bottom-sheet-handle{width:48px;height:5px;border-radius:3px;background:#EBE0CE;margin:14px auto 20px}
-    .wave-card{background:rgba(253,251,247,0.08);border:1px solid rgba(253,251,247,0.12);border-radius:24px;padding:2rem 1.5rem;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:transform .3s ease,border-color .3s ease}
-    .wave-card:hover{transform:translateY(-4px);border-color:rgba(253,251,247,0.25)}
-    /* MUSIC PLAYER */
-    .music-player{position:fixed;top:16px;left:16px;z-index:9998;display:flex;align-items:center;gap:10px;padding:8px 16px 8px 10px;border-radius:40px;background:rgba(58,10,18,0.55);border:1px solid rgba(253,251,247,0.15);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:pointer;transition:all .35s ease;color:#FDFBF7;user-select:none;-webkit-user-select:none}
-    .music-player:hover{background:rgba(58,10,18,0.72);border-color:rgba(253,251,247,0.28)}
-    .music-player:active{transform:scale(0.97)}
-    .music-player-icon{width:34px;height:34px;border-radius:50%;background:rgba(253,251,247,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .3s ease}
-    .music-player.playing .music-player-icon{background:rgba(140,45,59,0.45)}
-    .music-player-note{display:inline-block;transition:transform .3s ease}
-    .music-player.playing .music-player-note{animation:noteWave 1.2s ease-in-out infinite}
-    @keyframes noteWave{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-12deg) scale(1.1)}50%{transform:rotate(0) scale(1)}75%{transform:rotate(12deg) scale(1.1)}}
-    .music-player-info{display:flex;flex-direction:column;line-height:1.3}
-    .music-player-title{font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:600;color:#FDFBF7;white-space:nowrap}
-    .music-player-status{font-family:'Cairo',sans-serif;font-size:.65rem;font-weight:400;color:rgba(253,251,247,0.45);white-space:nowrap;transition:color .3s ease}
-    .music-player.playing .music-player-status{color:rgba(253,251,247,0.65)}
-    .music-player.playing{animation:playerPulse 3s ease-in-out infinite;border-color:rgba(253,251,247,0.3)}
-    @keyframes playerPulse{0%,100%{box-shadow:0 0 0 0 rgba(140,45,59,0.25)}50%{box-shadow:0 0 0 8px rgba(140,45,59,0)}}
-    .music-bars{display:flex;align-items:flex-end;gap:2px;height:14px;margin-right:4px}
-    .music-bars span{display:block;width:2.5px;border-radius:2px;background:rgba(253,251,247,0.5);transition:height .15s ease}
-    .music-player:not(.playing) .music-bars span{height:3px!important}
-    .music-player.playing .music-bars span:nth-child(1){animation:barAnim .8s ease-in-out 0s infinite alternate}
-    .music-player.playing .music-bars span:nth-child(2){animation:barAnim .8s ease-in-out .2s infinite alternate}
-    .music-player.playing .music-bars span:nth-child(3){animation:barAnim .8s ease-in-out .4s infinite alternate}
-    @keyframes barAnim{0%{height:3px}100%{height:14px}}
-    /* FORM */
-    .form-textarea{width:100%;min-height:160px;resize:vertical;background:#F7F1E5;border:2px solid #EBE0CE;border-radius:16px;padding:1.25rem;font-family:'Amiri',serif;font-size:1.05rem;line-height:1.9;color:#3A0A12;direction:rtl;outline:none;transition:border-color .3s ease}
-    .form-textarea:focus{border-color:#8C2D3B}
-    .form-textarea::placeholder{color:#8C2D3B;opacity:.5}
-    .submit-btn{width:100%;padding:1rem;border:none;border-radius:16px;background:#3A0A12;color:#FDFBF7;font-family:'Cairo',sans-serif;font-size:1.05rem;font-weight:600;cursor:pointer;transition:all .3s ease}
-    .submit-btn:hover{background:#4D101A;transform:translateY(-2px)}
-    .submit-btn:active{transform:translateY(0)}
-    .wa-btn{display:block;width:100%;padding:1rem;border:2px solid #EBE0CE;border-radius:16px;background:transparent;color:#3A0A12;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:500;text-align:center;text-decoration:none;transition:all .3s ease}
-    .wa-btn:hover{background:#EBE0CE;transform:translateY(-2px)}
-    .success-msg{display:none;text-align:center;padding:1.5rem;background:rgba(140,45,59,0.08);border-radius:16px;font-family:'Amiri',serif;font-size:1.15rem;color:#3A0A12;margin-bottom:1rem}
-    .success-msg.show{display:block;animation:fadeInUp .5s ease}
-    .success-msg.hide{animation:fadeOutDown .35s ease forwards}
-    .write-again-btn{display:inline-block;margin-top:.75rem;padding:.5rem 1.25rem;border:1.5px solid #EBE0CE;border-radius:12px;background:transparent;color:#8C2D3B;font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:all .3s ease}
-    .write-again-btn:hover{background:#EBE0CE}
-    @keyframes fadeOutDown{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(10px)}}
-    @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-    .hero-art{max-width:260px;margin:0 auto}
-    .date-badge{display:inline-block;background:rgba(140,45,59,0.12);color:#8C2D3B;padding:.3rem 1rem;border-radius:20px;font-family:'Cairo',sans-serif;font-size:.8rem;font-weight:600}
-    ::-webkit-scrollbar{width:4px}
-    ::-webkit-scrollbar-track{background:transparent}
-    ::-webkit-scrollbar-thumb{background:rgba(140,45,59,0.3);border-radius:4px}
-    .apology-card{background:#FDFBF7;color:#3A0A12;border-radius:24px;padding:2rem 1.5rem;box-shadow:0 12px 50px rgba(26,5,11,0.2);font-family:'Amiri',serif;font-size:1.1rem;line-height:2.1}
-    @media(min-width:768px){.apology-card{padding:3rem 2.5rem;font-size:1.2rem}}
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #26050B;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #8C2D3B;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #B03E50;
+    }
 
-    /* ===== PRIVATE GATE ===== */
-    #private-gate{position:fixed;inset:0;z-index:99999;background:linear-gradient(180deg,#26050B 0%,#3A0A12 50%,#4D101A 100%);display:flex;align-items:center;justify-content:center;transition:opacity .7s ease,visibility .7s ease;overflow:hidden}
-    #private-gate.unlocked{opacity:0;pointer-events:none;visibility:hidden}
-    .gate-cloud{position:absolute;opacity:.06;pointer-events:none}
-    .gate-card{background:#FDFBF7;color:#3A0A12;border-radius:28px;padding:2.5rem 2rem;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(26,5,11,0.3);text-align:center;position:relative;z-index:2}
-    .gate-input{width:100%;padding:.9rem 1.2rem;border:2px solid #EBE0CE;border-radius:14px;background:#F7F1E5;font-family:'Cairo',sans-serif;font-size:1rem;color:#3A0A12;text-align:center;direction:rtl;outline:none;transition:border-color .3s ease}
-    .gate-input:focus{border-color:#8C2D3B}
-    .gate-input::placeholder{color:#8C2D3B;opacity:.4}
-    .gate-btn{width:100%;padding:.9rem;border:none;border-radius:14px;background:#3A0A12;color:#FDFBF7;font-family:'Cairo',sans-serif;font-size:1.05rem;font-weight:600;cursor:pointer;transition:all .3s ease;margin-top:.8rem}
-    .gate-btn:hover{background:#4D101A;transform:translateY(-2px)}
-    .gate-error{color:#8C2D3B;font-family:'Cairo',sans-serif;font-size:.85rem;margin-top:.6rem;min-height:1.4rem}
-    @keyframes gateWave{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    /* RTL SVG Wave Divider Safety (No horizontal glitch or RTL translateX inversion) */
+    .wave-divider-wrapper {
+      direction: ltr !important;
+      width: 100% !important;
+      height: 65px !important;
+      display: block !important;
+      overflow: hidden !important;
+      line-height: 0 !important;
+      position: relative !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .wave-divider-wrapper svg {
+      width: 100% !important;
+      height: 65px !important;
+      display: block !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
 
-    /* ===== RESPONSE TOGGLE PILLS ===== */
-    .response-toggle{display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap}
-    .response-pill{flex:1;min-width:140px;padding:.7rem .8rem;border:2px solid #EBE0CE;border-radius:30px;background:transparent;color:#3A0A12;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .3s ease;text-align:center;user-select:none;-webkit-user-select:none}
-    .response-pill.active{background:#3A0A12;color:#FDFBF7;border-color:#3A0A12}
-    .response-pill:hover:not(.active){background:rgba(140,45,59,0.08)}
+    /* Safe Area Insets for iOS & Android */
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 1rem);
+    }
+    .pt-safe {
+      padding-top: env(safe-area-inset-top, 1rem);
+    }
 
-    /* ===== SECTION 5: SEA ECHO ===== */
-    .sea-letter-card{background:#FDFBF7;color:#3A0A12;border-radius:24px;padding:2rem 1.5rem;box-shadow:0 10px 40px rgba(26,5,11,0.12);font-family:'Amiri',serif;font-size:1.05rem;line-height:2.1;border:1px solid rgba(140,45,59,0.08);margin-bottom:1.5rem}
-    @media(min-width:768px){.sea-letter-card{padding:2.5rem 2rem;font-size:1.15rem}}
+    /* Equalizer Bar Animation */
+    @keyframes eqBar1 {
+      0%, 100% { height: 4px; }
+      50% { height: 16px; }
+    }
+    @keyframes eqBar2 {
+      0%, 100% { height: 14px; }
+      50% { height: 6px; }
+    }
+    @keyframes eqBar3 {
+      0%, 100% { height: 8px; }
+      50% { height: 18px; }
+    }
+    .eq-playing .bar-1 { animation: eqBar1 0.8s ease-in-out infinite; }
+    .eq-playing .bar-2 { animation: eqBar2 0.65s ease-in-out infinite 0.15s; }
+    .eq-playing .bar-3 { animation: eqBar3 0.9s ease-in-out infinite 0.3s; }
 
-    /* CLOUD-WAVE QA PAIRS */
-    .qa-pair{margin-bottom:1.5rem}
-    .qa-cloud{background:#FDFBF7;color:#3A0A12;border-radius:24px 24px 8px 24px;padding:1.25rem 1.5rem;box-shadow:0 6px 24px rgba(26,5,11,0.08);position:relative;font-family:'Amiri',serif;font-size:1rem;line-height:1.9}
-    .qa-cloud::before{content:'';position:absolute;top:-10px;right:18%;width:28px;height:20px;background:#FDFBF7;border-radius:50%}
-    .qa-cloud-label{font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:600;color:#8C2D3B;margin-bottom:.4rem}
-    .qa-wave{background:#3A0A12;color:#FDFBF7;border-radius:24px 24px 24px 8px;padding:1.25rem 1.5rem;box-shadow:0 6px 24px rgba(26,5,11,0.15);margin-top:.6rem;margin-right:1.5rem;font-family:'Amiri',serif;font-size:1rem;line-height:1.9}
-    .qa-wave-label{font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:600;color:rgba(253,251,247,0.5);margin-bottom:.4rem}
-    .qa-wave-pending{background:rgba(58,10,18,0.3);color:rgba(253,251,247,0.5);border-radius:16px;padding:.8rem 1.2rem;margin-top:.6rem;margin-right:1.5rem;font-family:'Cairo',sans-serif;font-size:.85rem;text-align:center;border:1px dashed rgba(253,251,247,0.15)}
-    .qa-timestamp{font-family:'Cairo',sans-serif;font-size:.7rem;color:rgba(140,45,59,0.4);margin-top:.3rem}
-
-    /* ADMIN */
-    .admin-input{width:100%;padding:.8rem 1rem;border:2px solid #EBE0CE;border-radius:14px;background:#F7F1E5;font-family:'Amiri',serif;font-size:1rem;color:#3A0A12;direction:rtl;outline:none;transition:border-color .3s ease;margin-bottom:.6rem}
-    .admin-input:focus{border-color:#8C2D3B}
-    .admin-btn{padding:.7rem 1.5rem;border:none;border-radius:12px;background:#3A0A12;color:#FDFBF7;font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .3s ease}
-    .admin-btn:hover{background:#4D101A;transform:translateY(-1px)}
-    .admin-section{display:none;margin-top:1.5rem;padding:1.5rem;border:2px dashed rgba(140,45,59,0.2);border-radius:20px;background:rgba(140,45,59,0.03)}
-    .admin-section.visible{display:block;animation:fadeInUp .4s ease}
-    .admin-wave-input{width:100%;padding:.7rem 1rem;border:2px solid #EBE0CE;border-radius:12px;background:#F7F1E5;font-family:'Amiri',serif;font-size:.95rem;color:#3A0A12;direction:rtl;outline:none;min-height:80px;resize:vertical;margin-top:.5rem}
-    .admin-trigger{cursor:pointer;opacity:.3;transition:opacity .3s ease;display:inline-block}
-    .admin-trigger:hover{opacity:.7}
+    /* Custom Glassmorphism */
+    .glass-burgundy {
+      background: rgba(38, 5, 11, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(253, 251, 247, 0.12);
+    }
+    .glass-cream {
+      background: rgba(253, 251, 247, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(58, 10, 18, 0.08);
+    }
+    
+    /* Ensure no text selection on UI icons/buttons */
+    .no-select {
+      user-select: none;
+      -webkit-user-select: none;
+    }
   </style>
 </head>
+<body class="bg-burgundy-900 text-cream-100 font-cairo antialiased selection:bg-burgundy-500 selection:text-cream-50 overflow-x-hidden relative min-h-screen">
 
-<body>
+  <!-- ========================================== -->
+  <!-- 1. TOUCH WATER RIPPLE CANVAS (GLOBAL)      -->
+  <!-- ========================================== -->
+  <canvas id="ripple-canvas" class="fixed inset-0 pointer-events-none z-[15] w-full h-full"></canvas>
 
-  <!-- ===== 1. PRIVATE ACCESS GATE (شاشة القفل السرية) ===== -->
-  <div id="private-gate">
-    <!-- Background drifting clouds in gate -->
-    <svg class="gate-cloud" style="top:10%;right:-40px;width:240px;" viewBox="0 0 200 80" fill="#FDFBF7">
-      <ellipse cx="70" cy="50" rx="60" ry="28"/><ellipse cx="120" cy="40" rx="50" ry="32"/><ellipse cx="50" cy="42" rx="40" ry="22"/>
-    </svg>
-    <svg class="gate-cloud" style="bottom:12%;left:-50px;width:220px;" viewBox="0 0 200 80" fill="#FDFBF7">
-      <ellipse cx="80" cy="48" rx="55" ry="26"/><ellipse cx="130" cy="38" rx="45" ry="28"/>
-    </svg>
+  <!-- ========================================== -->
+  <!-- 2. FLOATING BACKGROUND AUDIO PLAYER        -->
+  <!-- ========================================== -->
+  <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
+  
+  <aside class="fixed top-4 left-4 z-40 transition-all duration-300">
+    <button id="music-pill" onclick="toggleAudio()" class="group flex items-center gap-2.5 px-3.5 py-2 rounded-full glass-burgundy shadow-xl hover:bg-burgundy-800/90 border border-cream-100/20 text-cream-100 transition-all duration-300 active:scale-95 no-select cursor-pointer" title="تشغيل / إيقاف الأغنية">
+      <div id="equalizer-icon" class="flex items-end gap-[3px] h-4 w-4 justify-center">
+        <span class="bar-1 w-[3px] h-1.5 bg-cream-200 rounded-full transition-all"></span>
+        <span class="bar-2 w-[3px] h-3.5 bg-cream-100 rounded-full transition-all"></span>
+        <span class="bar-3 w-[3px] h-2 bg-cream-300 rounded-full transition-all"></span>
+      </div>
+      <div class="text-right flex flex-col justify-center">
+        <span class="text-xs font-bold tracking-tight text-cream-100">نفسي أحبك - أمير عيد 🎵</span>
+        <span id="music-status-text" class="text-[10px] text-cream-300/80 font-normal">اضغطي للتشغيل</span>
+      </div>
+    </button>
+  </aside>
 
-    <!-- Lock Card -->
-    <div class="gate-card">
-      <div style="font-size:2.8rem;margin-bottom:.5rem;animation:gateWave 3s ease-in-out infinite;">☁️🌊</div>
-      <h2 class="font-cairo font-bold text-xl md:text-2xl mb-6" style="color:#3A0A12;">
-        المكان ده معمول لغيمتي وبس ☁️
-      </h2>
+  <!-- ========================================== -->
+  <!-- 3. EXCLUSIVE SECURITY GATE (WHITELIST)     -->
+  <!-- ========================================== -->
+  <div id="security-gate" class="fixed inset-0 z-[99999] bg-[#1A0307] flex items-center justify-center p-4 transition-opacity duration-700">
+    <div class="w-full max-w-md bg-gradient-to-b from-[#26050B] to-[#3A0A12] border border-cream-100/20 rounded-3xl p-7 text-center shadow-2xl relative overflow-hidden">
+      <!-- Glow ambient backdrop -->
+      <div class="absolute -top-16 -left-16 w-44 h-44 bg-burgundy-500/25 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -right-16 w-44 h-44 bg-cream-300/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <form id="gate-form" onsubmit="event.preventDefault(); verifyGatePasscode();">
-        <input
-          type="password"
-          id="gate-passcode"
-          class="gate-input"
-          placeholder="••••••••"
-          autocomplete="off"
-          autofocus
-        />
-        <button type="submit" class="gate-btn">
-          افتحي البوابة 🤍
+      <!-- Cloud & Wave Emblem -->
+      <div class="relative mx-auto w-24 h-24 mb-5 flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full bg-cream-100/5 animate-pulse-subtle"></div>
+        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cream-100/15 to-transparent border border-cream-100/30 flex items-center justify-center shadow-inner">
+          <span class="text-4xl filter drop-shadow">☁️🌊</span>
+        </div>
+      </div>
+
+      <!-- Gate Header & Title -->
+      <h2 class="text-2xl font-black text-cream-100 mb-2 font-cairo">المكان ده معمول لعالمنا وبس</h2>
+      <p class="text-sm text-cream-300/85 mb-7 leading-relaxed font-normal">
+        مساحة هادية خاصة ومحمية.. معمولة بحب واعتذار وتفاصيل متتكررش 🤍
+      </p>
+
+      <!-- Gate Initial Sign-in Container -->
+      <div id="gate-initial-screen" class="space-y-4">
+        <button onclick="handleGoogleSignIn()" class="w-full py-3.5 px-5 rounded-2xl bg-cream-100 hover:bg-cream-200 text-burgundy-900 font-bold text-base shadow-lg hover:shadow-cream-100/15 transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98]">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>تسجيل الدخول باستخدام Google 🤍</span>
         </button>
-      </form>
+        <div id="gate-spinner" class="hidden text-xs text-cream-300/70 items-center justify-center gap-2 mt-2">
+          <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-cream-100"></i>
+          <span>جاري التحقق من بيانات الدخول...</span>
+        </div>
+      </div>
 
-      <div id="gate-error" class="gate-error"></div>
+      <!-- Gate Role Switcher Screen (For Admin / Testers Only) -->
+      <div id="gate-role-screen" class="hidden space-y-4 text-right">
+        <div class="bg-burgundy-950/60 p-4 rounded-2xl border border-cream-100/10 mb-4">
+          <p class="text-xs text-cream-200/90 text-center font-medium">
+            أهلاً بك يا بحر.. تم التعرف على حسابك كـ مسؤول / فاحص. اختر طريقة الدخول لعالمكم:
+          </p>
+        </div>
+        <button onclick="selectUserRole('bahr')" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-burgundy-700 to-burgundy-600 hover:from-burgundy-600 hover:to-burgundy-500 text-cream-100 font-bold text-sm shadow-md transition-all flex items-center justify-between border border-cream-100/20 active:scale-[0.98]">
+          <span class="flex items-center gap-2">
+            <span class="text-xl">🌊</span>
+            <span>دخول كـ بحر (صلاحيات كاملة)</span>
+          </span>
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        </button>
+        <button onclick="selectUserRole('ghym')" class="w-full py-3.5 px-4 rounded-2xl bg-cream-100 hover:bg-cream-200 text-burgundy-900 font-bold text-sm shadow-md transition-all flex items-center justify-between active:scale-[0.98]">
+          <span class="flex items-center gap-2">
+            <span class="text-xl">☁️</span>
+            <span>تجربة كـ غيم (وضع المعاينة)</span>
+          </span>
+          <i data-lucide="chevron-left" class="w-4 h-4 text-burgundy-900"></i>
+        </button>
+      </div>
+
+      <!-- Gate Block Screen (For Unauthorized Accounts) -->
+      <div id="gate-blocked-screen" class="hidden space-y-4">
+        <div class="bg-red-950/40 border border-red-500/30 p-4 rounded-2xl">
+          <p class="text-sm font-semibold text-red-200 leading-relaxed">
+            عفواً.. هذا المكان خاص جداً ولا يسمح بالدخول لهذا الحساب 🤍
+          </p>
+          <p id="gate-blocked-email" class="text-xs text-red-300/70 mt-2 font-mono dir-ltr text-center"></p>
+        </div>
+        <button onclick="handleGoogleSignIn()" class="w-full py-2.5 px-4 rounded-xl bg-cream-100/15 hover:bg-cream-100/25 text-cream-100 text-xs font-semibold transition">
+          محاولة تسجيل الدخول بحساب آخر 🔄
+        </button>
+      </div>
     </div>
   </div>
 
-  <script>
-    // Immediate Gate Check to prevent any visual flicker on reload
-    (function() {
-      const unlockTime = localStorage.getItem('gheim_unlock_time');
-      const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-      if (localStorage.getItem('gheim_unlocked')) {
-        localStorage.removeItem('gheim_unlocked');
-      }
-      if (unlockTime && (Date.now() - parseInt(unlockTime, 10)) < TWENTY_FOUR_HOURS) {
-        const gate = document.getElementById('private-gate');
-        if (gate) gate.classList.add('hidden', 'pointer-events-none', 'unlocked');
-      } else {
-        localStorage.removeItem('gheim_unlock_time');
-        const gate = document.getElementById('private-gate');
-        if (gate) gate.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'unlocked');
-      }
-    })();
-  </script>
+  <!-- ========================================== -->
+  <!-- MAIN APPLICATION CONTENT                   -->
+  <!-- ========================================== -->
+  <main id="app-content" class="relative z-20 min-h-screen opacity-100 transition-opacity duration-500">
 
-  <!-- ===== RIPPLE CANVAS ===== -->
-  <canvas id="ripple-canvas"></canvas>
+    <!-- ======================================== -->
+    <!-- SECTION 1: HERO & CORE APOLOGY           -->
+    <!-- ======================================== -->
+    <header class="relative min-h-[95vh] flex flex-col items-center justify-center px-4 pt-20 pb-16 overflow-hidden bg-gradient-to-b from-[#1A0307] via-[#26050B] to-[#3A0A12] text-center">
+      <!-- Ambient Cloud & Wave Graphic Backdrop -->
+      <div class="absolute inset-0 pointer-events-none opacity-25">
+        <div class="absolute top-1/4 -right-20 w-80 h-80 rounded-full bg-burgundy-500/30 blur-3xl"></div>
+        <div class="absolute bottom-1/4 -left-20 w-80 h-80 rounded-full bg-cream-300/15 blur-3xl"></div>
+      </div>
 
-  <!-- ===== BACKGROUND MUSIC ===== -->
-  <audio id="bg-music" loop preload="auto"><source src="music.mp3" type="audio/mpeg"></audio>
+      <div class="max-w-3xl w-full mx-auto relative z-10">
+        <!-- Cloud Embracing Sea Waves Animated SVG Emblem -->
+        <div class="mx-auto mb-8 w-28 h-28 relative flex items-center justify-center animate-float-slow">
+          <div class="absolute inset-0 rounded-full bg-cream-100/10 blur-xl"></div>
+          <svg viewBox="0 0 100 100" class="w-24 h-24 text-cream-100 drop-shadow-[0_0_12px_rgba(253,251,247,0.45)]">
+            <!-- Cloud Shape -->
+            <path d="M 28 50 A 14 14 0 0 1 52 38 A 18 18 0 0 1 76 50 A 12 12 0 0 1 70 70 L 30 70 A 12 12 0 0 1 28 50 Z" fill="rgba(253, 251, 247, 0.95)"/>
+            <!-- Gentle Sea Waves underneath embraced -->
+            <path d="M 20 74 Q 35 68 50 74 T 80 74" fill="none" stroke="#8C2D3B" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M 16 82 Q 32 76 50 82 T 84 82" fill="none" stroke="#3A0A12" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
 
-  <!-- ===== MUSIC PLAYER WIDGET ===== -->
-  <div class="music-player" id="music-player" role="button" aria-label="تشغيل/إيقاف الموسيقى" tabindex="0">
-    <div class="music-player-icon">
-      <span class="music-player-note" id="player-note">🎵</span>
-    </div>
-    <div class="music-player-info">
-      <span class="music-player-title">نفسي أحبك - أمير عيد 🎵</span>
-      <span class="music-player-status" id="player-status">اضغطي للتشغيل</span>
-    </div>
-    <div class="music-bars">
-      <span></span><span></span><span></span>
-    </div>
-  </div>
+        <!-- Main Title & Subtitle -->
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-cream-100 mb-4 tracking-tight leading-tight">
+          إلى غيمتي.. من بحرٍ أدرك هدوءه
+        </h1>
+        <p class="text-base sm:text-lg text-cream-300 font-medium max-w-xl mx-auto mb-10 leading-relaxed">
+          رسالة من غير تبرير.. عشان كل كلمة قلتيها اتسمعت واتفهمت
+        </p>
 
-  <!-- ===== DRIFTING BACKGROUND CLOUDS ===== -->
-  <div id="drift-clouds" style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;">
-    <svg class="drift-cloud" style="top:8%;right:-60px;width:260px;" viewBox="0 0 200 80" fill="#FDFBF7">
-      <ellipse cx="70" cy="50" rx="60" ry="28"/><ellipse cx="120" cy="40" rx="50" ry="32"/><ellipse cx="50" cy="42" rx="40" ry="22"/><ellipse cx="140" cy="52" rx="35" ry="20"/>
-    </svg>
-    <svg class="drift-cloud" style="top:25%;left:-80px;width:200px;" viewBox="0 0 200 80" fill="#FDFBF7">
-      <ellipse cx="80" cy="48" rx="55" ry="26"/><ellipse cx="130" cy="38" rx="45" ry="28"/><ellipse cx="55" cy="40" rx="35" ry="20"/>
-    </svg>
-    <svg class="drift-cloud" style="top:50%;right:-40px;width:180px;" viewBox="0 0 200 80" fill="#FDFBF7">
-      <ellipse cx="90" cy="45" rx="50" ry="25"/><ellipse cx="130" cy="38" rx="40" ry="22"/><ellipse cx="60" cy="50" rx="38" ry="18"/>
-    </svg>
-    <svg class="drift-cloud" style="top:72%;left:-50px;width:220px;" viewBox="0 0 200 80" fill="#FDFBF7">
-      <ellipse cx="75" cy="46" rx="55" ry="28"/><ellipse cx="125" cy="40" rx="48" ry="30"/><ellipse cx="50" cy="50" rx="36" ry="22"/>
-    </svg>
-    <svg class="drift-cloud" style="top:90%;right:10%;width:160px;" viewBox="0 0 200 80" fill="#FDFBF7">
-      <ellipse cx="85" cy="44" rx="50" ry="24"/><ellipse cx="125" cy="38" rx="42" ry="26"/>
-    </svg>
-  </div>
+        <!-- Apology Card (Verbatim Words) -->
+        <article class="bg-[#FDFBF7] text-[#3A0A12] rounded-3xl p-6 sm:p-10 text-right shadow-2xl border border-cream-300/40 relative font-amiri text-lg sm:text-xl leading-[2.2] space-y-5">
+          <!-- Subtle Top Floral/Wave Ornament -->
+          <div class="text-center font-cairo text-sm text-[#8C2D3B] font-semibold tracking-wider pb-3 border-b border-[#3A0A12]/10 mb-4">
+            اعتراف حقيقي من القلب • بـدون أي عـذر
+          </div>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SECTION 1: HERO & CORE APOLOGY             -->
-  <!-- ═══════════════════════════════════════════ -->
-  <section id="hero" class="relative min-h-screen flex flex-col items-center justify-center px-5 py-16 overflow-hidden" style="background: linear-gradient(180deg, #26050B 0%, #3A0A12 50%, #4D101A 100%);">
-    <!-- Particles Container -->
-    <div id="particles" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+          <p>
+            أنا فعلاً شوفتك، وسمعتك، وفهمت كل كلمة قلتيها كويس جداً.. وقريت كل حرف بوجعه.
+          </p>
 
-    <!-- Hero Art: Cloud + Sea Wave SVG -->
-    <div class="hero-art relative z-10 mb-8 reveal">
-      <svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="150" cy="55" rx="52" ry="28" fill="rgba(253,251,247,0.12)"/>
-        <ellipse cx="110" cy="60" rx="35" ry="22" fill="rgba(253,251,247,0.1)"/>
-        <ellipse cx="190" cy="58" rx="38" ry="24" fill="rgba(253,251,247,0.1)"/>
-        <ellipse cx="150" cy="48" rx="30" ry="18" fill="rgba(253,251,247,0.15)"/>
-        <path d="M20 130 Q60 110 100 130 Q140 150 180 130 Q220 110 260 130 Q280 140 300 130" stroke="rgba(253,251,247,0.2)" stroke-width="2" fill="none">
-          <animate attributeName="d" dur="4s" repeatCount="indefinite"
-            values="M20 130 Q60 110 100 130 Q140 150 180 130 Q220 110 260 130 Q280 140 300 130;
-                    M20 130 Q60 150 100 130 Q140 110 180 130 Q220 150 260 130 Q280 120 300 130;
-                    M20 130 Q60 110 100 130 Q140 150 180 130 Q220 110 260 130 Q280 140 300 130"/>
-        </path>
-        <path d="M10 145 Q55 128 100 145 Q145 162 190 145 Q235 128 280 145" stroke="rgba(253,251,247,0.13)" stroke-width="1.5" fill="none">
-          <animate attributeName="d" dur="5s" repeatCount="indefinite"
-            values="M10 145 Q55 128 100 145 Q145 162 190 145 Q235 128 280 145;
-                    M10 145 Q55 162 100 145 Q145 128 190 145 Q235 162 280 145;
-                    M10 145 Q55 128 100 145 Q145 162 190 145 Q235 128 280 145"/>
-        </path>
-        <line x1="130" y1="80" x2="130" y2="105" stroke="rgba(253,251,247,0.12)" stroke-width="1.2" stroke-dasharray="4 6">
-          <animate attributeName="y1" values="80;82;80" dur="2s" repeatCount="indefinite"/>
-          <animate attributeName="y2" values="105;110;105" dur="2s" repeatCount="indefinite"/>
-        </line>
-        <line x1="155" y1="82" x2="155" y2="108" stroke="rgba(253,251,247,0.1)" stroke-width="1" stroke-dasharray="3 7">
-          <animate attributeName="y1" values="82;85;82" dur="2.5s" repeatCount="indefinite"/>
-          <animate attributeName="y2" values="108;114;108" dur="2.5s" repeatCount="indefinite"/>
-        </line>
-        <line x1="170" y1="78" x2="170" y2="102" stroke="rgba(253,251,247,0.08)" stroke-width="5 5">
-          <animate attributeName="y1" values="78;80;78" dur="3s" repeatCount="indefinite"/>
-          <animate attributeName="y2" values="102;106;102" dur="3s" repeatCount="indefinite"/>
-        </line>
+          <p>
+            أنا فعلاً عرفت غلطتي، وكنت أعمى وتسرعت في الحكم جداً.. وفي لحظة واحدة خرج مني كلام حسسك إنك بقيتي محتاجة تدافعي عن نفسك أو تثبتي براءتك قدامي، في الوقت اللي أنا كنت فيه الشخص الوحيد اللي المفروض تحسي معاه بأمان وما تحتاجيش تبرري له أي حاجة.
+          </p>
+
+          <p>
+            أنا مش جاي أبرر اللي قلته، لأن مهما حصل مفيش أي مبرر في الدنيا يخليني أتصرف كده.. كل اللي صدر مني كان غباء وتسرع أعمى مني ملوش أي عذر مهما كانت الظروف.
+          </p>
+
+          <p>
+            أنا لسه مستوعب بجد إن كلامك مكنش أبداً إنك 'توكسيك' أو بتأذيني، بالعكس تماماً.. ده كان صرخة استغاثة لإنسانة فضلت تستوعبني وتستحمل كبت وضغط كبير، وطبيعي جداً إنك تيجي في مرة وتنفجري وتطلعي كل اللي شلتيه جواكي.. وأنا للأسف مكنتش شايف غير نفسي واعتبرت ده هجوم، في حين إنك عمرك ما كنتي وحشة، ولا عمرك كنتي مؤذية، وعمرك ما هتبقي كده.
+          </p>
+
+          <p>
+            معاكي كل الحق في كل اللي قلتيه عني.. أنا في أوقات كتير جداً كنت أناني، بضغط عليكي عشان مكالمة أو كلام حلو من غير حتى ما أسأل انتي طاقتك إيه أو تعبانة قد إيه.. والنقطة دي كانت بتتكرر كتير، وكنت بكون الحاجة اللي بتكسرك وتضغطك أكتر، بدل ما أكون الشخص اللي يحتويكي ويفهمك وقت ما تكون الدنيا صعبة.
+          </p>
+
+          <p>
+            وفوق ده كله، أنا بعترف بعصبيتي الزايدة اللي كانت بتخوف بجد وقت الزعل وتهدد أمانك معايا، وتخليكي في قفص اتهام وتشككي في نفسك قدام أكتر حد المفروض واثق فيكي لأبعد حد وعارف نيتك ونقاءك من جوة.
+          </p>
+
+          <p>
+            والمرادي أنا مش جاي آخدك على قد عقلك بكلمتين وأرجع بعدها بيومين زي الأول وأسوء.. أنا شفت عيوبي بوضوح واتعلمت من غلطي، وجاي بتأسفلك بجد ومن كل قلبي على كل تصرف وكل ضغط عملته.
+          </p>
+
+          <p>
+            آخر حاجة عايزك تعرفيها، إني مش باعت الكلام ده ولا عامل الموقع عشان أقولك 'يلا نرجع وخلاص'.. زعلك ومساحتك حقك الكامل تاخديهم براحتك وعلى مهلك خالص بدون أي ضغط أو استعجال، ومش مستني منك رد فوري.. أنا بس كان يهمني إنك تعرفي إني سمعتك وفهمتك بجد.
+          </p>
+
+          <p class="font-bold text-[#26050B] pt-2">
+            وفي آخر الموقع خالص، هتلاقي مساحة معمولة عشانك انتي وبس، لو حابة تقولي أي حاجة فيها في أي وقت تحسيه مناسب.. القرار ليكي أولاً وأخيراً.
+          </p>
+        </article>
+      </div>
+    </header>
+
+    <!-- Wave Divider 1: Transitioning from Burgundy to Warm Cream (Direction LTR explicitly) -->
+    <div class="wave-divider-wrapper bg-[#3A0A12]">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,32L60,42.7C120,53,240,75,360,74.7C480,75,600,53,720,48C840,43,960,53,1080,64C1200,75,1320,85,1380,90.7L1440,96L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z" fill="#F7F1E5"></path>
       </svg>
     </div>
 
-    <!-- Title -->
-    <h1 class="relative z-10 text-3xl md:text-5xl font-bold text-center font-cairo mb-4 reveal" style="color: #FDFBF7;">
-      إلى غيمتي.. من بحرٍ أدرك هدوءه
-    </h1>
-
-    <!-- Subtitle -->
-    <p class="relative z-10 text-base md:text-lg text-center font-cairo mb-10 reveal" style="color: rgba(253,251,247,0.65); max-width: 560px;">
-      رسالة من غير تبرير.. عشان كل كلمة قلتيها اتسمعت واتفهمت
-    </p>
-
-    <!-- Main Apology Card -->
-    <div class="relative z-10 w-full max-w-2xl mx-auto reveal">
-      <div class="apology-card">
-        <p class="mb-6">أنا فعلاً شوفتك، وسمعتك، وفهمت كل كلمة قلتيها كويس جداً.. وقريت كل حرف بوجعه.</p>
-        <p class="mb-6">أنا فعلاً عرفت غلطتي، وكنت أعمى وتسرعت في الحكم جداً.. وفي لحظة واحدة خرج مني كلام حسسك إنك بقيتي محتاجة تدافعي عن نفسك أو تثبتي براءتك قدامي، في الوقت اللي أنا كنت فيه الشخص الوحيد اللي المفروض تحسي معاه بأمان وما تحتاجيش تبرري له أي حاجة.</p>
-        <p class="mb-6">أنا مش جاي أبرر اللي قلته، لأن مهما حصل مفيش أي مبرر في الدنيا يخليني أتصرف كده.. كل اللي صدر مني كان غباء وتسرع أعمى مني ملوش أي عذر مهما كانت الظروف.</p>
-        <p class="mb-6">أنا لسه مستوعب بجد إن كلامك مكنش أبداً إنك 'توكسيك' أو بتأذيني، بالعكس تماماً.. ده كان صرخة استغاثة لإنسانة فضلت تستوعبني وتستحمل كبت وضغط كبير، وطبيعي جداً إنك تيجي في مرة وتنفجري وتطلعي كل اللي شلتيه جواكي.. وأنا للأسف مكنتش شايف غير نفسي واعتبرت ده هجوم، في حين إنك عمرك ما كنتي وحشة، ولا عمرك كنتي مؤذية، وعمرك ما هتبقي كده.</p>
-        <p class="mb-6">معاكي كل الحق في كل اللي قلتيه عني.. أنا في أوقات كتير جداً كنت أناني، بضغط عليكي عشان مكالمة أو كلام حلو من غير حتى ما أسأل انتي طاقتك إيه أو تعبانة قد إيه.. والنقطة دي كانت بتتكرر كتير، وكنت بكون الحاجة اللي بتكسرك وتضغطك أكتر، بدل ما أكون الشخص اللي يحتويكي ويفهمك وقت ما تكون الدنيا صعبة.</p>
-        <p class="mb-6">وفوق ده كله، أنا بعترف بعصبيتي الزايدة اللي كانت بتخوف بجد وقت الزعل وتهدد أمانك معايا، وتخليكي في قفص اتهام وتشككي في نفسك قدام أكتر حد المفروض واثق فيكي لأبعد حد وعارف نيتك ونقاءك من جوة.</p>
-        <p class="mb-6">والمرادي أنا مش جاي آخدك على قد عقلك بكلمتين وأرجع بعدها بيومين زي الأول وأسوء.. أنا شفت عيوبي بوضوح واتعلمت من غلطي، وجاي بتأسفلك بجد ومن كل قلبي على كل تصرف وكل ضغط عملته.</p>
-        <p>آخر حاجة عايزك تعرفيها، إني مش باعت الكلام ده ولا عامل الموقع عشان أقولك 'يلا نرجع وخلاص'.. زعلك ومساحتك حقك الكامل تاخديهم براحتك وعلى مهلك خالص بدون أي ضغط أو استعجال، ومش مستني منك رد فوري.. أنا بس كان يهمني إنك تعرفي إني سمعتك وفهمتك بجد.</p>
-        <p class="mt-6" style="color: #8C2D3B;">وفي آخر الموقع خالص، هتلاقي مساحة معمولة عشانك انتي وبس، لو حابة تقولي أي حاجة فيها في أي وقت تحسيه مناسب.. القرار ليكي أولاً وأخيراً.</p>
-      </div>
-    </div>
-
-    <!-- Scroll indicator -->
-    <div class="relative z-10 mt-12 animate-bounce reveal">
-      <i data-lucide="chevrons-down" style="width:28px;height:28px;color:rgba(253,251,247,0.4);"></i>
-    </div>
-  </section>
-
-  <!-- ===== WAVE DIVIDER: Burgundy → Cream ===== -->
-  <div class="wave-divider" style="background:#F7F1E5; margin-top:-1px;">
-    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style="width:200%;min-width:1440px;" class="wave-anim-1">
-      <path d="M0,40 C180,100 360,0 540,50 C720,100 900,10 1080,60 C1260,110 1440,30 1440,30 L1440,0 L0,0 Z" fill="#3A0A12" opacity="0.7"/>
-      <path d="M0,30 C200,90 400,10 600,55 C800,100 1000,20 1200,65 C1400,110 1440,40 1440,40 L1440,0 L0,0 Z" fill="#4D101A"/>
-    </svg>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SECTION 2: SKY OF MEMORIES                 -->
-  <!-- ═══════════════════════════════════════════ -->
-  <section id="memories" class="relative py-20 px-5" style="background: #F7F1E5;">
-    <!-- Section Header -->
-    <div class="text-center mb-16">
-      <h2 class="text-2xl md:text-4xl font-bold font-cairo mb-3 reveal" style="color: #3A0A12;">
-        سماء الذكريات | محطات الغيم
-      </h2>
-      <p class="text-sm md:text-base font-cairo reveal" style="color: #8C2D3B; max-width: 480px; margin: 0 auto;">
-        اضغطي على كل غيمة.. تواريخ عمرها ما كانت ولا هتكون وهم
-      </p>
-    </div>
-
-    <!-- Timeline -->
-    <div class="relative max-w-lg mx-auto" style="padding-bottom: 2rem;">
-      <div class="timeline-line"></div>
-
-      <!-- Cloud 1 -->
-      <div class="relative mb-16 reveal" style="z-index:1;">
-        <div class="cloud-card" onclick="openSheet(0)">
-          <div class="mb-3"><span class="date-badge">12 أغسطس 2025</span></div>
-          <h3 class="font-cairo font-bold text-lg mb-1" style="color:#3A0A12;">أول رسالة وإفيه غيّر كل حاجة</h3>
-          <p class="font-cairo text-sm" style="color:#8C2D3B;">اضغطي عشان تقري الذكرى كاملة ☁️</p>
-        </div>
-      </div>
-
-      <!-- Cloud 2 -->
-      <div class="relative mb-16 reveal" style="z-index:1;">
-        <div class="cloud-card" onclick="openSheet(1)">
-          <div class="mb-3"><span class="date-badge">20 أغسطس 2025</span></div>
-          <h3 class="font-cairo font-bold text-lg mb-1" style="color:#3A0A12;">أول مكالمة وأول أمان حقيقي</h3>
-          <p class="font-cairo text-sm" style="color:#8C2D3B;">اضغطي عشان تقري الذكرى كاملة ☁️</p>
-        </div>
-      </div>
-
-      <!-- Cloud 3 -->
-      <div class="relative mb-16 reveal" style="z-index:1;">
-        <div class="cloud-card" onclick="openSheet(2)">
-          <div class="mb-3"><span class="date-badge">25 فبراير 2026</span></div>
-          <h3 class="font-cairo font-bold text-lg mb-1" style="color:#3A0A12;">أول مرة أعيط!</h3>
-          <p class="font-cairo text-sm" style="color:#8C2D3B;">اضغطي عشان تقري الذكرى كاملة ☁️</p>
-        </div>
-      </div>
-
-      <!-- Cloud 4 -->
-      <div class="relative mb-16 reveal" style="z-index:1;">
-        <div class="cloud-card" onclick="openSheet(3)">
-          <div class="mb-3"><span class="date-badge">22 أغسطس 2026</span></div>
-          <h3 class="font-cairo font-bold text-lg mb-1" style="color:#3A0A12;">سنة كاملة سوا.. وفايل غـيـم</h3>
-          <p class="font-cairo text-sm" style="color:#8C2D3B;">اضغطي عشان تقري الذكرى كاملة ☁️</p>
-        </div>
-      </div>
-
-      <!-- Cloud 5 -->
-      <div class="relative mb-4 reveal" style="z-index:1;">
-        <div class="cloud-card" onclick="openSheet(4)">
-          <div class="mb-3"><span class="date-badge">10 أكتوبر 2026</span></div>
-          <h3 class="font-cairo font-bold text-lg mb-1" style="color:#3A0A12;">10/10 | الوقود اللي رجّعني أقف على رجلي</h3>
-          <p class="font-cairo text-sm" style="color:#8C2D3B;">اضغطي عشان تقري الذكرى كاملة ☁️</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== WAVE DIVIDER: Cream → Burgundy ===== -->
-  <div class="wave-divider" style="background:#3A0A12; margin-top:-1px;">
-    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style="width:200%;min-width:1440px;" class="wave-anim-2">
-      <path d="M0,50 C160,10 320,90 480,40 C640,0 800,80 960,40 C1120,0 1280,70 1440,40 L1440,0 L0,0 Z" fill="#F7F1E5" opacity="0.7"/>
-      <path d="M0,40 C200,100 400,0 600,50 C800,90 1000,10 1200,55 C1350,90 1440,30 1440,30 L1440,0 L0,0 Z" fill="#F7F1E5"/>
-    </svg>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SECTION 3: SEA WAVES                       -->
-  <!-- ═══════════════════════════════════════════ -->
-  <section id="waves" class="relative py-20 px-5" style="background: #3A0A12;">
-    <!-- Section Header -->
-    <div class="text-center mb-14">
-      <h2 class="text-2xl md:text-4xl font-bold font-cairo mb-3 reveal" style="color: #FDFBF7;">
-        أمواج البحر | تفاصيل فيكي ما تتنسيش
-      </h2>
-      <p class="text-sm md:text-base font-cairo reveal" style="color: rgba(253,251,247,0.55); max-width: 480px; margin: 0 auto;">
-        حاجات بتثبتلي كل يوم إن وجودك مكنش صدفة
-      </p>
-    </div>
-
-    <!-- Wave Cards -->
-    <div class="max-w-2xl mx-auto space-y-8">
-      <!-- Wave 1 -->
-      <div class="wave-card reveal">
-        <h3 class="font-cairo font-bold text-xl mb-4 flex items-center gap-3" style="color: #FDFBF7;">
-          <i data-lucide="waves" style="width:22px;height:22px;color:#8C2D3B;"></i>
-          الموجة الأولى: عـبـث
-        </h3>
-        <p class="font-amiri text-base md:text-lg" style="color: rgba(253,251,247,0.85);">
-          كورسات الميكب وكمية الضحك والعبث اللي كان بيحصل بيننا، والهزار اللي كنا عايشينه.. لما كنا بنلعب وأكسبك كل مرة (ما عدا مرة واحدة يتيمة كسبتيني فيها بصراحة!)، ولا لما كنا بنقعد ننم على الكوكب كله ونيجي في الآخر نقول: كفاية كده عشان ميبقاش ذنب ونجيب في سيرة حد.. المواقف دي مستحيل أنساها ومستحيل تتكرر في حياتي إلا وانتي موجودة. الحاجات دي عرفتني أد إيه انتي أقرب حد لقلبي، وأكتر إنسانة بكون معاها على طبيعتي من غير ما أحتاج أجمّل أي حاجة.
-        </p>
-      </div>
-
-      <!-- Wave 2 -->
-      <div class="wave-card reveal">
-        <h3 class="font-cairo font-bold text-xl mb-4 flex items-center gap-3" style="color: #FDFBF7;">
-          <i data-lucide="pen-tool" style="width:22px;height:22px;color:#8C2D3B;"></i>
-          الموجة الثانية: موهبة الكتابة
-        </h3>
-        <p class="font-amiri text-base md:text-lg" style="color: rgba(253,251,247,0.85);">
-          كون إنك كاتبة ده بالنسبة لي شيء مبهر لأبعد حد.. أنا كشخص علاقته باللغة العربية مش قوية أوي، لما بشوف كتاباتك وطريقتك بنبهر بجد ومن غير أي مجاملة. أسلوبك في كل مرة بيبهرني أكتر من اللي قبلها، سواء بتكتبي رومانسي، أو رعب، أو ارتجال واقتباسات لمواقف حقيقية.. انتي موهوبة بطريقة نادرة وليكي بصمة متتنساش أبداً.
-        </p>
-      </div>
-
-      <!-- Wave 3 -->
-      <div class="wave-card reveal">
-        <h3 class="font-cairo font-bold text-xl mb-4 flex items-center gap-3" style="color: #FDFBF7;">
-          <i data-lucide="mic" style="width:22px;height:22px;color:#8C2D3B;"></i>
-          الموجة الثالثة: صوتك وضحكتك
-        </h3>
-        <p class="font-amiri text-base md:text-lg" style="color: rgba(253,251,247,0.85);">
-          صوتك بالنسبة لي مكنش مجرد صوت حد بحبه وخلاص.. ده الصوت اللي كان دايماً بيطمني ويزقني لقدام ويشجعني أكمل في أصعب أوقاتي. وضحكتك تحديداً كانت الحاجة الوحيدة اللي بتخليني أحس إني مبسوط بجد من قلبي، وإن في حاجة حلوة أنا نجحت أعملها في الدنيا.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== WAVE DIVIDER: Burgundy → Cream Gradient ===== -->
-  <div class="wave-divider" style="background: linear-gradient(180deg, #F7F1E5 0%, #EBE0CE 100%); margin-top:-1px;">
-    <svg viewBox="0 0 1440 100" preserveAspectRatio="none" style="width:200%;min-width:1440px;" class="wave-anim-1">
-      <path d="M0,60 C240,10 480,90 720,40 C960,0 1200,80 1440,50 L1440,0 L0,0 Z" fill="#3A0A12"/>
-    </svg>
-  </div>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SECTION 4: HER SAFE SPACE & CONTACT        -->
-  <!-- ═══════════════════════════════════════════ -->
-  <section id="safe-space" class="relative py-20 px-5" style="background: linear-gradient(180deg, #F7F1E5 0%, #EBE0CE 50%, #3A0A12 100%);">
-    <!-- Section Header -->
-    <div class="text-center mb-10">
-      <h2 class="text-2xl md:text-4xl font-bold font-cairo mb-3 reveal" style="color: #3A0A12;">
-        مساحتك الخاصة | وقت ما تكوني جاهزة
-      </h2>
-    </div>
-
-    <!-- Safe Space Card -->
-    <div class="max-w-lg mx-auto reveal">
-      <div class="rounded-3xl p-6 md:p-8" style="background: #FDFBF7; box-shadow: 0 16px 60px rgba(26,5,11,0.15);">
-        <!-- Intro Text -->
-        <p class="font-amiri text-base md:text-lg mb-8" style="color: #3A0A12; line-height: 2;">
-          المكان ده معمول عشانك. لو حابة تكتبي أي حاجة في قلبك وتوصلني على الإيميل من غير ما نضطر نفتح شات، اكتبيها هنا.. ولو حابة تتكلمي في أي وقت، هتلاقيني مستنيكي بهدوء ومن غير أي ضغط.
-        </p>
-
-        <!-- Success Message (shown above form, dismissible) -->
-        <div class="success-msg" id="success-msg">
-          <p>وصلت رسالتك بهدوء.. شكراً إنك اتكلمتي 🤍</p>
-          <button type="button" class="write-again-btn" id="write-again-btn">كتابة رسالة أخرى ✍️</button>
+    <!-- ======================================== -->
+    <!-- SECTION 2: SKY OF MEMORIES               -->
+    <!-- ======================================== -->
+    <section id="memories-section" class="bg-[#F7F1E5] text-[#26050B] py-16 px-4">
+      <div class="max-w-4xl mx-auto">
+        <!-- Section Header -->
+        <div class="text-center mb-12">
+          <span class="inline-block px-4 py-1 rounded-full bg-burgundy-900/10 text-burgundy-800 text-xs font-bold mb-3">
+            سجل محطاتنا الخالدة ☁️
+          </span>
+          <h2 class="text-3xl sm:text-4xl font-black text-burgundy-900 mb-3 font-cairo">
+            سماء الذكريات | محطات الغيم
+          </h2>
+          <p class="text-base text-burgundy-800/80 font-normal">
+            اضغطي على كل غيمة.. تواريخ عمرها ما كانت ولا هتكون وهم
+          </p>
         </div>
 
-        <!-- Email Form with Option Toggles -->
-        <form id="contact-form" class="mb-6">
-          <input type="hidden" name="_subject" id="form-subject" value="🤍 [فضفضة - اسمعني بس] رسالة جديدة من غيم ☁️" />
-          <input type="hidden" name="_captcha" value="false" />
-          <input type="hidden" name="حالة_الطلب" id="form-request-status" value="══════════ 🤍 الغيم بتفضفض وعايزاك تسمعها بس من غير رد 🤍 ══════════" />
+        <!-- Timeline Container -->
+        <div id="memories-timeline" class="relative space-y-6 before:absolute before:inset-0 before:right-6 sm:before:right-1/2 before:w-0.5 before:bg-burgundy-900/20 before:pointer-events-none">
+          <!-- Dynamically Rendered & Chronologically Sorted Memories -->
+        </div>
 
-          <!-- Interactive Response Toggle Pills -->
-          <div class="response-toggle">
-            <button
-              type="button"
-              class="response-pill active"
-              id="pill-listen"
-              onclick="setResponseOption('listen')"
-            >
+        <!-- Add Memory Action Button -->
+        <div class="mt-12 text-center">
+          <button onclick="openModal('add-memory-modal')" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-burgundy-900 hover:bg-burgundy-800 text-cream-100 font-bold text-sm shadow-xl hover:shadow-burgundy-900/20 transition-all active:scale-95">
+            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+            <span>زودي غيمة في سمانا ☁️</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wave Divider 2: Transitioning from Cream to Deep Burgundy (Direction LTR explicitly) -->
+    <div class="wave-divider-wrapper bg-[#F7F1E5]">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z" fill="#3A0A12"></path>
+      </svg>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- SECTION 3: SEA WAVES (HER SPECIAL TRAITS)-->
+    <!-- ======================================== -->
+    <section id="sea-waves-section" class="bg-[#3A0A12] text-cream-100 py-16 px-4">
+      <div class="max-w-4xl mx-auto">
+        <!-- Section Header -->
+        <div class="text-center mb-12">
+          <span class="inline-block px-4 py-1 rounded-full bg-cream-100/10 text-cream-200 text-xs font-bold mb-3 border border-cream-100/20">
+            تفاصيل من القلب 🌊
+          </span>
+          <h2 class="text-3xl sm:text-4xl font-black text-cream-100 mb-3 font-cairo">
+            أمواج البحر | تفاصيل فيكي ما تتنسيش
+          </h2>
+          <p class="text-base text-cream-300/80 font-normal">
+            حاجات بتثبتلي كل يوم إن وجودك مكنش صدفة
+          </p>
+        </div>
+
+        <!-- Sea Waves Grid -->
+        <div id="sea-waves-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Dynamically & Statically rendered Waves -->
+        </div>
+
+        <!-- Add Sea Wave Button (Visible only to 'bahr') -->
+        <div id="bahr-add-wave-wrapper" class="hidden mt-10 text-center">
+          <button onclick="openModal('add-wave-modal')" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-cream-100 hover:bg-cream-200 text-burgundy-900 font-bold text-sm shadow-lg transition active:scale-95">
+            <i data-lucide="waves" class="w-4 h-4"></i>
+            <span>إضافة موجة جديدة 🌊</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wave Divider 3: Transitioning from Burgundy to Warm Cream (Direction LTR explicitly) -->
+    <div class="wave-divider-wrapper bg-[#3A0A12]">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,32L80,48C160,64,320,96,480,96C640,96,800,64,960,48C1120,32,1280,32,1360,32L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" fill="#F7F1E5"></path>
+      </svg>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- SECTION 4: RAIN DROPLETS GALLERY         -->
+    <!-- ======================================== -->
+    <section id="rain-section" class="bg-[#F7F1E5] text-[#26050B] py-16 px-4">
+      <div class="max-w-5xl mx-auto">
+        <!-- Section Header -->
+        <div class="text-center mb-10">
+          <span class="inline-block px-4 py-1 rounded-full bg-burgundy-900/10 text-burgundy-800 text-xs font-bold mb-3">
+            ذكريات وصوت وصور 🌧️
+          </span>
+          <h2 class="text-3xl sm:text-4xl font-black text-burgundy-900 mb-3 font-cairo">
+            قسم المطر 🌧️
+          </h2>
+          <p class="text-sm sm:text-base text-burgundy-800/85 font-normal max-w-xl mx-auto leading-relaxed">
+            المطر هو لغة اللقا بين البحر وغيمته.. وكل قطرة هنا بتفكرنا إحنا قد إيه كنا وما زلنا بنكمّل بعض 🌧️✨
+          </p>
+        </div>
+
+        <!-- Add Droplet Action Button (Available to both) -->
+        <div class="text-center mb-8">
+          <button onclick="openModal('add-droplet-modal')" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-burgundy-900 hover:bg-burgundy-800 text-cream-100 font-bold text-sm shadow-xl transition active:scale-95">
+            <i data-lucide="cloud-rain" class="w-5 h-5"></i>
+            <span>ضيف قطرة جديدة في المطر 🌧️</span>
+          </button>
+        </div>
+
+        <!-- Droplets Responsive Grid -->
+        <div id="rain-droplets-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <!-- Dynamically populated droplets -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Wave Divider 4: Transitioning from Warm Cream to Deep Burgundy (Direction LTR explicitly) -->
+    <div class="wave-divider-wrapper bg-[#F7F1E5]">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,64L60,69.3C120,75,240,85,360,80C480,75,600,53,720,48C840,43,960,53,1080,64C1200,75,1320,85,1380,90.7L1440,96L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z" fill="#26050B"></path>
+      </svg>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- SECTION 5: HER SAFE SPACE & CONTACT      -->
+    <!-- ======================================== -->
+    <section id="safe-space-section" class="bg-[#26050B] text-cream-100 py-16 px-4">
+      <div class="max-w-2xl mx-auto">
+        <!-- Section Header -->
+        <div class="text-center mb-8">
+          <span class="inline-block px-4 py-1 rounded-full bg-cream-100/10 text-cream-200 text-xs font-bold mb-3 border border-cream-100/20">
+            مساحتك الحرة بدون أي إحراج 🤍
+          </span>
+          <h2 class="text-3xl sm:text-4xl font-black text-cream-100 mb-3 font-cairo">
+            مساحتك الخاصة | وقت ما تكوني جاهزة
+          </h2>
+          <p class="text-sm sm:text-base text-cream-300/80 font-normal leading-relaxed">
+            المكان ده اتعمل عشانك.. لو حابة تفضفضي أو تقولي أي حاجة، سواء عايزاني أسمعك بس أو أرد، الكلمة هنا بأمان تام
+          </p>
+        </div>
+
+        <!-- Safe Space Card Form -->
+        <div class="bg-gradient-to-b from-[#3A0A12] to-[#26050B] border border-cream-100/20 rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+          <!-- Toggle Pills -->
+          <div class="flex items-center justify-center gap-3 mb-6 flex-wrap">
+            <button type="button" id="pill-listen-only" onclick="setSafeSpacePill('listen_only')" class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border bg-cream-100 text-burgundy-900 border-cream-100 shadow-md">
               🎧 اسمعني بس (مش مستنية رد)
             </button>
-            <button
-              type="button"
-              class="response-pill"
-              id="pill-reply"
-              onclick="setResponseOption('reply')"
-            >
+            <button type="button" id="pill-need-reply" onclick="setSafeSpacePill('need_reply')" class="px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border bg-burgundy-950/60 text-cream-200 border-cream-100/20 hover:border-cream-100/40">
               💌 عايزاك ترد وتفهمني
             </button>
           </div>
 
-          <textarea
-            name="message"
-            id="contact-message"
-            required
-            class="form-textarea mb-4"
-            placeholder="اكتبي كل اللي في قلبك هنا.. كلامك هيوصلني في سرية وأمان"
-          ></textarea>
+          <!-- The Contact Form -->
+          <form id="safe-space-form" onsubmit="handleSafeSpaceSubmit(event)" class="space-y-5">
+            <div>
+              <label for="safe-space-message" class="block text-xs font-medium text-cream-200 mb-2">
+                اكتبي براحتك.. مفيش أي حدود ولا شروط:
+              </label>
+              <textarea id="safe-space-message" rows="5" required placeholder="أي حاجة في خاطرك.. كلمة، عتاب، أو حتى فضفضة بسيطة..." class="w-full rounded-2xl bg-burgundy-950/80 border border-cream-100/20 text-cream-100 placeholder-cream-300/40 p-4 text-sm font-amiri text-lg leading-relaxed focus:outline-none focus:border-cream-100 focus:ring-1 focus:ring-cream-100 transition resize-none"></textarea>
+            </div>
 
-          <button type="submit" class="submit-btn" id="submit-btn">
-            ابعتي الرسالة بهدوء ✉️
+            <!-- Submit Button -->
+            <button type="submit" id="safe-space-submit-btn" class="w-full py-3.5 px-6 rounded-2xl bg-cream-100 hover:bg-cream-200 text-burgundy-900 font-bold text-sm sm:text-base shadow-xl hover:shadow-cream-100/20 transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span>إرسال إلى البحر بهدوء 🕊️</span>
+            </button>
+          </form>
+
+          <!-- Form Feedback Container (Hidden initially) -->
+          <div id="safe-space-success" class="hidden text-center py-6 space-y-4">
+            <div class="w-16 h-16 rounded-full bg-cream-100/15 border border-cream-100/30 flex items-center justify-center mx-auto text-2xl">
+              🕊️
+            </div>
+            <p class="text-base font-bold text-cream-100">
+              رسالتك وصلت للبحر بأمان تام.. وسمعها بهدوء وتقدير كبير 🤍
+            </p>
+            <p class="text-xs text-cream-300/80 max-w-sm mx-auto">
+              تقدري تكتبي رسالة تانية في أي وقت أو ترجعي تاني وقت ما تحبي
+            </p>
+            <button onclick="resetSafeSpaceForm()" class="px-5 py-2.5 rounded-xl bg-cream-100/20 hover:bg-cream-100/30 text-cream-100 text-xs font-bold transition">
+              كتابة رسالة أخرى ✍️
+            </button>
+          </div>
+
+          <!-- Direct WhatsApp Link Button -->
+          <div class="mt-8 pt-6 border-t border-cream-100/10 text-center">
+            <a href="https://wa.me/201003887602" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs font-semibold text-cream-300 hover:text-cream-100 transition bg-burgundy-950/40 px-4 py-2 rounded-full border border-cream-100/10">
+              <span>أو التحدث مباشرة عبر واتساب</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- SECTION 6: SEA ECHO & CLOUD-WAVE Q&A     -->
+    <!-- ======================================== -->
+    <section id="sea-echo-section" class="bg-[#1A0307] text-cream-100 py-16 px-4">
+      <div class="max-w-4xl mx-auto space-y-16">
+
+        <!-- PART A: صدى البحر | رسائل وتوضيحات ليكي -->
+        <div>
+          <div class="text-center mb-10">
+            <span class="inline-block px-4 py-1 rounded-full bg-cream-100/10 text-cream-200 text-xs font-bold mb-3 border border-cream-100/20">
+              كلمات لا تنتهي 🌊
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-black text-cream-100 mb-3 font-cairo">
+              صدى البحر | رسائل وتوضيحات ليكي 🌊
+            </h2>
+            <p class="text-sm sm:text-base text-cream-300/80 font-normal">
+              كل رسالة هنا بتخرج من صميم قلبي عشان توضحلك اللي مكنتش عارف أقوله
+            </p>
+          </div>
+
+          <!-- Letters Stream -->
+          <div id="sea-letters-container" class="space-y-6">
+            <!-- Dynamically loaded sea letters -->
+          </div>
+
+          <!-- Admin Publish Letter Box (Only for 'bahr') -->
+          <div id="bahr-letter-admin-box" class="hidden mt-8 bg-burgundy-900/90 border border-cream-100/20 rounded-3xl p-6">
+            <h3 class="text-base font-bold text-cream-100 mb-4 flex items-center gap-2">
+              <i data-lucide="feather" class="w-5 h-5 text-cream-300"></i>
+              <span>نشر رسالة جديدة في صدى البحر (صلاحيات البحر)</span>
+            </h3>
+            <form onsubmit="handlePublishLetter(event)" class="space-y-4">
+              <div>
+                <input type="text" id="letter-title" required placeholder="عنوان الرسالة..." class="w-full rounded-xl bg-burgundy-950 border border-cream-100/20 text-cream-100 px-4 py-2.5 text-sm focus:outline-none focus:border-cream-100">
+              </div>
+              <div>
+                <textarea id="letter-content" rows="4" required placeholder="نص الرسالة المطول بأسلوب البحر..." class="w-full rounded-xl bg-burgundy-950 border border-cream-100/20 text-cream-100 p-4 text-sm font-amiri text-base leading-relaxed focus:outline-none focus:border-cream-100"></textarea>
+              </div>
+              <button type="submit" class="py-2.5 px-5 rounded-xl bg-cream-100 hover:bg-cream-200 text-burgundy-900 font-bold text-xs shadow transition">
+                نشر الرسالة وإشعار الغيم فوراً ✉️
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- PART B: غيمة وموجة ☁️〰️🌊 -->
+        <div class="pt-8 border-t border-cream-100/10">
+          <div class="text-center mb-8">
+            <span class="inline-block px-4 py-1 rounded-full bg-cream-100/10 text-cream-200 text-xs font-bold mb-3 border border-cream-100/20">
+              استفسار ورد هادئ ☁️〰️🌊
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-black text-cream-100 mb-2 font-cairo">
+              غيمة وموجة ☁️〰️🌊
+            </h2>
+            <p class="text-sm text-cream-300/80 font-normal max-w-lg mx-auto leading-relaxed">
+              لو في كلمة قولتها، أو حاجة حابة تفهميها بهدوء.. سيبيها هنا في غيمة، والبحر هيرد عليها في موجة 🤍
+            </p>
+          </div>
+
+          <!-- Ask Cloud Input Box -->
+          <div class="bg-gradient-to-b from-[#26050B] to-[#3A0A12] border border-cream-100/20 rounded-3xl p-6 shadow-xl mb-8">
+            <form onsubmit="handleAskCloud(event)" class="flex flex-col sm:flex-row gap-3">
+              <input type="text" id="ask-cloud-input" required placeholder="ابعتي غيمة استفسار أو سؤال في بالك..." class="flex-1 rounded-2xl bg-burgundy-950/80 border border-cream-100/20 text-cream-100 placeholder-cream-300/40 px-4 py-3 text-sm focus:outline-none focus:border-cream-100">
+              <button type="submit" class="py-3 px-6 rounded-2xl bg-cream-100 hover:bg-cream-200 text-burgundy-900 font-bold text-sm shadow transition flex items-center justify-center gap-2 whitespace-nowrap active:scale-95">
+                <span>ارسمي الغيمة هنا ☁️</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Cloud & Wave Threads Container -->
+          <div id="clouds-list-container" class="space-y-6">
+            <!-- Rendered Clouds & Wave replies -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- FOOTER WITH ROLE CONTROLS                -->
+    <!-- ======================================== -->
+    <footer class="bg-[#120104] text-cream-300/70 py-10 px-4 text-center border-t border-cream-100/10 text-xs space-y-4">
+      <div class="flex items-center justify-center gap-2 text-cream-100 font-bold text-sm">
+        <span>بحر</span>
+        <span class="text-xs text-cream-300/50">✦</span>
+        <span>غيم</span>
+      </div>
+      <p class="max-w-md mx-auto text-[11px] leading-relaxed text-cream-300/60 font-amiri text-sm">
+        "ستبقى الغيمة أمان البحر الدائم.. وسيبقى البحر حافظاً لكل قطرة مطر."
+      </p>
+
+      <!-- Identity Switcher / Sign Out Button -->
+      <div class="pt-4 flex items-center justify-center gap-4 flex-wrap">
+        <span id="footer-active-role-badge" class="px-3 py-1 rounded-full bg-cream-100/10 text-cream-200 font-medium"></span>
+        <button onclick="handleRoleSwitchOrSignOut()" class="px-4 py-1.5 rounded-full bg-burgundy-800 hover:bg-burgundy-700 text-cream-100 font-semibold transition border border-cream-100/20 active:scale-95">
+          تبديل الهوية / تسجيل خروج 🔄
+        </button>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- FLOATING REAL-TIME CHAT BUTTON             -->
+  <!-- ========================================== -->
+  <button id="floating-chat-btn" onclick="openChatDrawer()" class="fixed bottom-6 left-6 z-40 w-14 h-14 rounded-full bg-gradient-to-tr from-burgundy-700 to-burgundy-500 text-cream-100 shadow-2xl border-2 border-cream-100/40 flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300 group" title="شات البحر والغيم">
+    <i data-lucide="message-circle" class="w-6 h-6 transition-transform group-hover:scale-110"></i>
+    <!-- Unread Badge -->
+    <span id="chat-unread-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-cream-100 text-burgundy-900 text-[10px] font-black flex items-center justify-center shadow-lg border border-burgundy-900 animate-pulse">0</span>
+  </button>
+
+  <!-- ========================================== -->
+  <!-- CHAT PASSCODE MODAL                        -->
+  <!-- ========================================== -->
+  <div id="chat-passcode-modal" class="hidden fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-gradient-to-b from-[#26050B] to-[#3A0A12] border border-cream-100/30 rounded-3xl p-6 text-center shadow-2xl relative">
+      <button onclick="closeModal('chat-passcode-modal')" class="absolute top-4 left-4 text-cream-300/60 hover:text-cream-100 transition p-1">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="w-14 h-14 rounded-full bg-cream-100/10 border border-cream-100/20 flex items-center justify-center mx-auto mb-4 text-2xl">
+        🔒
+      </div>
+      <h3 class="text-lg font-bold text-cream-100 mb-1">الرقم السري لشات البحر والغيم</h3>
+      <p class="text-xs text-cream-300/80 mb-5">
+        تاريخ مميز بيننا.. اليوم اللي بدأ فيه كل شيء 🤍
+      </p>
+
+      <form onsubmit="handleChatPasscodeSubmit(event)" class="space-y-4">
+        <input type="password" id="chat-passcode-input" required placeholder="ادخلي الرمز السري..." class="w-full rounded-2xl bg-burgundy-950 border border-cream-100/30 text-center text-cream-100 px-4 py-3 text-base tracking-widest focus:outline-none focus:border-cream-100">
+        <p id="chat-passcode-error" class="hidden text-xs text-red-300 font-semibold"></p>
+        <button type="submit" class="w-full py-3 rounded-2xl bg-cream-100 hover:bg-cream-200 text-burgundy-900 font-bold text-sm shadow transition">
+          فتح المحادثة 💬
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- REAL-TIME CHAT DRAWER                      -->
+  <!-- ========================================== -->
+  <div id="chat-drawer" class="hidden fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex justify-start">
+    <div class="w-full sm:w-[420px] bg-gradient-to-b from-[#1A0307] to-[#26050B] h-full shadow-2xl flex flex-col border-l border-cream-100/15 relative">
+
+      <!-- Chat Drawer Header -->
+      <div class="p-4 bg-burgundy-900/90 border-b border-cream-100/10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <!-- Dynamic Partner Avatar with Glow Indicator -->
+          <div class="relative">
+            <div id="partner-avatar-ring" class="w-11 h-11 rounded-full border-2 border-cream-100/30 flex items-center justify-center text-xl bg-burgundy-950 transition-all duration-500">
+              <span id="partner-avatar-icon">☁️</span>
+            </div>
+            <!-- Online status green dot -->
+            <span id="partner-online-dot" class="hidden absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-burgundy-900 shadow"></span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h4 id="partner-name-text" class="text-sm font-bold text-cream-100">غيم ☁️</h4>
+            </div>
+            <p id="partner-status-text" class="text-[11px] text-cream-300/70 transition-colors">
+              جاري فحص التواجد...
+            </p>
+          </div>
+        </div>
+
+        <button onclick="closeChatDrawer()" class="p-2 text-cream-300/70 hover:text-cream-100 rounded-full hover:bg-cream-100/10 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Messages Scroll Area -->
+      <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto space-y-3.5 text-sm">
+        <!-- Messages loaded in real time -->
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="p-3 bg-burgundy-950/90 border-t border-cream-100/10 pb-safe">
+        <form onsubmit="handleSendChatMessage(event)" class="flex items-center gap-2">
+          <input type="text" id="chat-message-input" required placeholder="همسة جديدة في عالمنا..." class="flex-1 rounded-2xl bg-burgundy-900/90 border border-cream-100/20 text-cream-100 placeholder-cream-300/40 px-4 py-2.5 text-sm focus:outline-none focus:border-cream-100">
+          <button type="submit" class="w-10 h-10 rounded-2xl bg-cream-100 hover:bg-cream-200 text-burgundy-900 flex items-center justify-center shadow transition active:scale-95 shrink-0">
+            <i data-lucide="send" class="w-4 h-4"></i>
           </button>
         </form>
-
-        <!-- WhatsApp Button -->
-        <a href="https://wa.me/201003887602" target="_blank" rel="noopener noreferrer" class="wa-btn mt-4 inline-block">
-          أو لو حابة نتكلم على واتساب وقت ما تحبي 💬
-        </a>
-
-        <!-- Mailto fallback (shown on form error) -->
-        <a href="mailto:kareemo20333@gmail.com?subject=رسالة من غيم ☁️" id="mailto-fallback" class="wa-btn mt-3 inline-block" style="display:none; border-color: #8C2D3B; color: #8C2D3B;">
-          أو ابعتي إيميل مباشر من هنا ✉️
-        </a>
       </div>
-    </div>
-  </section>
 
-  <!-- ===== WAVE DIVIDER: Cream/Burgundy → Deep Burgundy ===== -->
-  <div class="wave-divider" style="background:#26050B; margin-top:-1px;">
-    <svg viewBox="0 0 1440 100" preserveAspectRatio="none" style="width:200%;min-width:1440px;" class="wave-anim-2">
-      <path d="M0,40 C180,90 360,10 540,60 C720,100 900,20 1080,70 C1260,110 1440,30 1440,30 L1440,0 L0,0 Z" fill="#3A0A12"/>
-    </svg>
+    </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- SECTION 5: SEA ECHO (صدى البحر والردود)     -->
-  <!-- ═══════════════════════════════════════════ -->
-  <section id="sea-echo" class="relative py-20 px-5" style="background: linear-gradient(180deg, #26050B 0%, #3A0A12 60%, #26050B 100%);">
-    <div class="max-w-2xl mx-auto">
-      <!-- Section Header -->
-      <div class="text-center mb-14">
-        <h2 class="text-2xl md:text-4xl font-bold font-cairo mb-3 reveal" style="color: #FDFBF7;">
-          صدى البحر | رسائل وتوضيحات ليكي 🌊
-        </h2>
-        <p class="text-sm md:text-base font-cairo reveal" style="color: rgba(253,251,247,0.65); max-width: 520px; margin: 0 auto;">
-          هنا هرد على كل حاجة في قلبك، وهكتبلك كل الكلام والفضفضة اللي عايز أوصلهالك بهدوء
-        </p>
+  <!-- ========================================== -->
+  <!-- MODAL: MEMORY DETAIL (BOTTOM-SHEET)        -->
+  <!-- ========================================== -->
+  <div id="memory-detail-modal" class="hidden fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full sm:max-w-lg bg-[#FDFBF7] text-[#26050B] rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 max-h-[85vh] overflow-y-auto shadow-2xl relative border border-cream-300">
+      <button onclick="closeModal('memory-detail-modal')" class="absolute top-4 left-4 p-2 text-burgundy-900/60 hover:text-burgundy-900 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-2 mb-3">
+        <span id="detail-memory-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-burgundy-900/10 text-burgundy-800"></span>
+        <span id="detail-memory-date" class="text-xs text-burgundy-800/70 font-mono"></span>
       </div>
 
-      <!-- Sea Long-Form Letters Container -->
-      <div id="sea-letters-container" class="space-y-6 mb-16">
-        <!-- Rendered dynamically via StorageService -->
-      </div>
+      <h3 id="detail-memory-title" class="text-xl sm:text-2xl font-black text-burgundy-900 mb-4 font-cairo leading-snug"></h3>
+      
+      <p id="detail-memory-content" class="text-base sm:text-lg text-burgundy-950 font-amiri leading-[2.1] whitespace-pre-line"></p>
 
-      <!-- SUB-SECTION: CLOUD QUESTION & WAVE REPLY -->
-      <div class="mt-20 pt-10 border-t border-burgundy-700/50">
-        <div class="text-center mb-10">
-          <h3 class="text-xl md:text-3xl font-bold font-cairo mb-3 reveal" style="color: #FDFBF7;">
-            غيمة وموجة ☁️〰️🌊
-          </h3>
-          <p class="text-sm md:text-base font-cairo reveal" style="color: rgba(253,251,247,0.65); max-width: 500px; margin: 0 auto;">
-            لو في كلمة قولتها، أو حاجة حابة تفهميها بهدوء.. سيبيها هنا في غيمة، والبحر هيرد عليها في موجة 🤍
-          </p>
-        </div>
-
-        <!-- Her Input Box (ابعتي غيمة استفسار) -->
-        <div class="reveal mb-12">
-          <div class="rounded-3xl p-6" style="background: #FDFBF7; box-shadow: 0 12px 40px rgba(0,0,0,0.25);">
-            <div class="flex items-center gap-2 mb-3">
-              <span style="font-size: 1.4rem;">☁️</span>
-              <h4 class="font-cairo font-bold text-base" style="color: #3A0A12;">ابعتي غيمة استفسار</h4>
-            </div>
-            <textarea
-              id="cloud-input"
-              class="form-textarea cloud-input mb-4"
-              style="min-height: 100px; font-size: 1rem;"
-              placeholder="اكتبي سؤالك أو الكلمة اللي محتاجة تفهميها بهدوء هنا..."
-            ></textarea>
-            <button
-              type="button"
-              onclick="submitCloudQuestion()"
-              id="submit-cloud-btn"
-              class="submit-btn"
-            >
-              ارسمي الغيمة هنا ☁️
-            </button>
-            <div id="cloud-feedback" class="mt-3 text-center text-sm font-cairo" style="color:#8C2D3B; display:none;"></div>
-          </div>
-        </div>
-
-        <!-- Paired Display Container -->
-        <div id="clouds-list" class="clouds-container space-y-8" data-alias="qa-pairs-container">
-          <!-- Rendered dynamically via Firestore -->
-        </div>
-
-        <!-- Secret Admin Controls Container (Unlocked via Admin PIN) -->
-        <div id="admin-panel" class="admin-section">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="font-cairo font-bold text-base text-cream-100 flex items-center gap-2">
-              <span>🌊</span> لوحة تحكم البحر (وضع المدير نشط)
-            </h4>
-            <button onclick="logoutAdmin()" class="text-xs font-cairo underline text-cream-200 opacity-70 hover:opacity-100">
-              تسجيل خروج
-            </button>
-          </div>
-
-          <!-- Add Sea Letter Form -->
-          <div class="mb-6 p-4 rounded-xl bg-burgundy-900/60 border border-burgundy-600/40">
-            <h5 class="font-cairo font-semibold text-sm text-cream-100 mb-3">➕ إضافة رسالة فضفضة جديدة في صدى البحر</h5>
-            <input
-              type="text"
-              id="admin-letter-title"
-              class="admin-input"
-              placeholder="عنوان الرسالة (مثلاً: كلام من قلبي ليكي)"
-            />
-            <input
-              type="text"
-              id="admin-letter-date"
-              class="admin-input"
-              placeholder="التاريخ (مثلاً: نوفمبر 2026)"
-            />
-            <textarea
-              id="admin-letter-content"
-              class="admin-input"
-              style="min-height: 120px;"
-              placeholder="اكتب رسالة البحر الطويلة هنا..."
-            ></textarea>
-            <button type="button" onclick="adminAddLetter()" class="admin-btn">
-              نشر رسالة البحر 🌊
-            </button>
-          </div>
-        </div>
+      <div class="mt-8 text-center">
+        <button onclick="closeModal('memory-detail-modal')" class="w-full py-3 rounded-2xl bg-burgundy-900 text-cream-100 font-bold text-sm shadow hover:bg-burgundy-800 transition">
+          إغلاق النافذة 🤍
+        </button>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- FOOTER                                     -->
-  <!-- ═══════════════════════════════════════════ -->
-  <footer class="py-12 px-5 text-center" style="background: #26050B;">
-    <p class="font-amiri text-lg md:text-xl reveal" style="color: rgba(253,251,247,0.5); max-width: 520px; margin: 0 auto; line-height: 2;">
-      البحر هيفضل هادي ومستني.. حتى لو الغيم اختار ياخد وقته في سماه.
-    </p>
-    <div class="mt-6 flex items-center justify-center gap-2" style="color: rgba(253,251,247,0.2);">
-      <i data-lucide="cloud" style="width:16px;height:16px;"></i>
-      <span class="font-cairo text-xs">البحر والغيم</span>
-      <!-- Secret Admin Trigger Icon -->
-      <span
-        id="admin-trigger"
-        class="admin-trigger"
-        onclick="promptAdminLogin()"
-        title="البحر"
-      >🌊</span>
+  <!-- ========================================== -->
+  <!-- MODAL: ADD NEW MEMORY                      -->
+  <!-- ========================================== -->
+  <div id="add-memory-modal" class="hidden fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full sm:max-w-md bg-[#FDFBF7] text-[#26050B] rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl relative border border-cream-300">
+      <button onclick="closeModal('add-memory-modal')" class="absolute top-4 left-4 p-2 text-burgundy-900/60 hover:text-burgundy-900 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <h3 class="text-lg font-bold text-burgundy-900 mb-1 flex items-center gap-2">
+        <span>➕ إضافة غيمة ذكرى جديدة</span>
+      </h3>
+      <p class="text-xs text-burgundy-800/70 mb-5">
+        سجلي تاريخ وموقف يفضل منور في سمانا دايماً ☁️
+      </p>
+
+      <form onsubmit="handleSaveMemory(event)" class="space-y-4 text-right">
+        <div>
+          <label class="block text-xs font-bold text-burgundy-900 mb-1">تاريخ اليوم:</label>
+          <input type="date" id="new-memory-date" required class="w-full rounded-xl bg-white border border-burgundy-900/20 px-4 py-2.5 text-sm text-burgundy-900 focus:outline-none focus:border-burgundy-900">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-burgundy-900 mb-1">عنوان الذكرى:</label>
+          <input type="text" id="new-memory-title" required placeholder="مثال: ضحكة من غير ميعاد..." class="w-full rounded-xl bg-white border border-burgundy-900/20 px-4 py-2.5 text-sm text-burgundy-900 focus:outline-none focus:border-burgundy-900">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-burgundy-900 mb-1">تفاصيل الحكاية:</label>
+          <textarea id="new-memory-content" rows="4" required placeholder="اكتبي اللي حسيتيه وفكرك باليوم ده..." class="w-full rounded-xl bg-white border border-burgundy-900/20 p-3 text-sm font-amiri text-base leading-relaxed text-burgundy-900 focus:outline-none focus:border-burgundy-900"></textarea>
+        </div>
+
+        <button type="submit" id="save-memory-btn" class="w-full py-3.5 rounded-2xl bg-burgundy-900 hover:bg-burgundy-800 text-cream-100 font-bold text-sm shadow transition">
+          حفظ الغيمة في سماء الذكريات ☁️
+        </button>
+      </form>
     </div>
-  </footer>
+  </div>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- BOTTOM SHEET MODAL                         -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div class="bottom-sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
-  <div class="bottom-sheet" id="sheet">
-    <div class="bottom-sheet-handle"></div>
-    <div class="mb-4"><span class="date-badge" id="sheet-date"></span></div>
-    <h3 class="font-cairo font-bold text-xl mb-5" id="sheet-title" style="color:#3A0A12;"></h3>
-    <p class="font-amiri text-base md:text-lg" id="sheet-content" style="color:#3A0A12; line-height:2.1;"></p>
-    <button onclick="closeSheet()" class="mt-8 w-full py-3 rounded-2xl font-cairo font-semibold text-sm" style="background:#F7F1E5; color:#8C2D3B; border:none; cursor:pointer;">
-      أغلقي ☁️
+  <!-- ========================================== -->
+  <!-- MODAL: ADD SEA WAVE (BAHR ONLY)           -->
+  <!-- ========================================== -->
+  <div id="add-wave-modal" class="hidden fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-gradient-to-b from-[#26050B] to-[#3A0A12] border border-cream-100/30 rounded-3xl p-6 shadow-2xl relative text-cream-100">
+      <button onclick="closeModal('add-wave-modal')" class="absolute top-4 left-4 p-2 text-cream-300/60 hover:text-cream-100 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <h3 class="text-lg font-bold text-cream-100 mb-1 flex items-center gap-2">
+        <span>🌊 إضافة موجة جديدة (تفصيلة متتنسيش)</span>
+      </h3>
+      <p class="text-xs text-cream-300/80 mb-5">
+        خاصة بالبحر فقط لتدوين تفاصيل غيمته
+      </p>
+
+      <form onsubmit="handleSaveWave(event)" class="space-y-4 text-right">
+        <div>
+          <label class="block text-xs font-bold text-cream-200 mb-1">عنوان الموجة:</label>
+          <input type="text" id="new-wave-title" required placeholder="مثال: الموجة الرابعة: تفصيلة معينة..." class="w-full rounded-xl bg-burgundy-950 border border-cream-100/20 px-4 py-2.5 text-sm text-cream-100 focus:outline-none focus:border-cream-100">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-cream-200 mb-1">التفاصيل والأثر:</label>
+          <textarea id="new-wave-content" rows="4" required placeholder="كتابة الكلمات بتفاصيلها العميقة..." class="w-full rounded-xl bg-burgundy-950 border border-cream-100/20 p-3 text-sm font-amiri text-base leading-relaxed text-cream-100 focus:outline-none focus:border-cream-100"></textarea>
+        </div>
+
+        <button type="submit" id="save-wave-btn" class="w-full py-3.5 rounded-2xl bg-cream-100 hover:bg-cream-200 text-burgundy-900 font-bold text-sm shadow transition">
+          إطلاق الموجة في البحر 🌊
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADD RAIN DROPLET (UPLOAD MEDIA)     -->
+  <!-- ========================================== -->
+  <div id="add-droplet-modal" class="hidden fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full sm:max-w-md bg-[#FDFBF7] text-[#26050B] rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl relative border border-cream-300">
+      <button onclick="closeModal('add-droplet-modal')" class="absolute top-4 left-4 p-2 text-burgundy-900/60 hover:text-burgundy-900 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <h3 class="text-lg font-bold text-burgundy-900 mb-1 flex items-center gap-2">
+        <span>🌧️ إضافة قطرة مطر جديدة</span>
+      </h3>
+      <p class="text-xs text-burgundy-800/70 mb-5">
+        صورة، فيديو، أو تسجيل صوتي يوثق قطرة بيننا
+      </p>
+
+      <form onsubmit="handleSaveDroplet(event)" class="space-y-4 text-right">
+        <div>
+          <label class="block text-xs font-bold text-burgundy-900 mb-1">اختاري الملف (صورة، فيديو، فويس نوت):</label>
+          <input type="file" id="new-droplet-file" required accept="image/*,video/*,audio/*,.m4a,.ogg,.opus,.mp3,.wav,.aac" class="w-full text-xs text-burgundy-900 file:ml-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-burgundy-900 file:text-cream-100 hover:file:bg-burgundy-800 cursor-pointer">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-burgundy-900 mb-1">التعليق / الكابشن:</label>
+          <input type="text" id="new-droplet-caption" required placeholder="كلمات تصف هذه القطرة..." class="w-full rounded-xl bg-white border border-burgundy-900/20 px-4 py-2.5 text-sm text-burgundy-900 focus:outline-none focus:border-burgundy-900">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-burgundy-900 mb-1">تاريخ القطرة (اختياري):</label>
+          <input type="date" id="new-droplet-date" class="w-full rounded-xl bg-white border border-burgundy-900/20 px-4 py-2.5 text-sm text-burgundy-900 focus:outline-none focus:border-burgundy-900">
+        </div>
+
+        <!-- Upload Progress Indicator -->
+        <div id="droplet-upload-progress" class="hidden text-center py-2">
+          <div class="inline-flex items-center gap-2 text-xs text-burgundy-900 font-bold">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+            <span id="droplet-progress-text">جاري رفع الملف إلى سحابة المطر...</span>
+          </div>
+        </div>
+
+        <button type="submit" id="save-droplet-btn" class="w-full py-3.5 rounded-2xl bg-burgundy-900 hover:bg-burgundy-800 text-cream-100 font-bold text-sm shadow transition">
+          إسقاط القطرة في سماء المطر 🌧️
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- LIGHTBOX: FULL MEDIA PREVIEW (DROPLETS)    -->
+  <!-- ========================================== -->
+  <div id="media-lightbox" class="hidden fixed inset-0 z-[80] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
+    <button onclick="closeLightbox()" class="absolute top-5 left-5 z-20 text-cream-100/80 hover:text-cream-100 p-2 rounded-full bg-white/10 transition">
+      <i data-lucide="x" class="w-6 h-6"></i>
     </button>
+
+    <div class="max-w-4xl max-h-[85vh] w-full flex flex-col items-center justify-center relative">
+      <!-- Media Content Placeholder -->
+      <div id="lightbox-content-slot" class="w-full flex items-center justify-center"></div>
+
+      <!-- Caption & Meta -->
+      <div class="mt-4 text-center max-w-xl px-4">
+        <span id="lightbox-badge" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-cream-100/20 text-cream-100 mb-2"></span>
+        <p id="lightbox-caption" class="text-base text-cream-100 font-cairo font-semibold leading-relaxed"></p>
+        <span id="lightbox-date" class="text-xs text-cream-300/70 font-mono mt-1 block"></span>
+      </div>
+    </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- JAVASCRIPT                                 -->
-  <!-- ═══════════════════════════════════════════ -->
+  <!-- ========================================== -->
+  <!-- SINGLE UNIFIED SCRIPT ARCHITECTURE         -->
+  <!-- ========================================== -->
   <script>
-  // ========================
-  // FIREBASE INITIALIZATION
-  // ========================
-  const firebaseConfig = {
-    apiKey: "AIzaSyB6txE_Zm5xaXqwW3ZGnLNIljFA6AyuiF8",
-    authDomain: "bahr-and-ghym.firebaseapp.com",
-    projectId: "bahr-and-ghym",
-    storageBucket: "bahr-and-ghym.firebasestorage.app",
-    messagingSenderId: "750195725716",
-    appId: "1:750195725716:web:e7bdfaca83a69304b1eb81"
-  };
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+    /* =====================================================================
+       1. FIREBASE INITIALIZATION & GLOBAL SINGLETON DECLARATIONS
+       ===================================================================== */
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6txE_Zm5xaXqwW3ZGnLNIljFA6AyuiF8",
+      authDomain: "bahr-and-ghym.firebaseapp.com",
+      projectId: "bahr-and-ghym",
+      storageBucket: "bahr-and-ghym.firebasestorage.app",
+      messagingSenderId: "750195725716",
+      appId: "1:750195725716:web:e7bdfaca83a69304b1eb81"
+    };
 
-  // ========================
-  // 1. ALLOWED PASSCODES & GATE LOGIC
-  // ========================
-  const ALLOWED_PASSCODES = [
-    "1/9/2025",
-    "01/09/2025",
-    "1-9-2025",
-    "01-09-2025",
-    "1/9",
-    "01/09",
-    "1092025",
-    "01092025"
-  ];
-
-  function normalizePasscode(str) {
-    if (!str) return "";
-    return str
-      .trim()
-      .toLowerCase()
-      .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)) // convert Arabic numerals if any
-      .replace(/\s+/g, "");
-  }
-
-  function verifyGatePasscode() {
-    const input = document.getElementById("gate-passcode");
-    const errorEl = document.getElementById("gate-error");
-    const val = normalizePasscode(input.value);
-
-    const isMatch = ALLOWED_PASSCODES.some(p => normalizePasscode(p) === val);
-
-    if (isMatch) {
-      localStorage.setItem("gheim_unlock_time", Date.now().toString());
-      if (localStorage.getItem("gheim_unlocked")) {
-        localStorage.removeItem("gheim_unlocked");
-      }
-      const gate = document.getElementById("private-gate");
-      if (gate) {
-        gate.classList.add("unlocked", "opacity-0", "pointer-events-none");
-        setTimeout(() => {
-          gate.classList.add("hidden");
-        }, 700);
-      }
-      errorEl.textContent = "";
-    } else {
-      errorEl.textContent = "تاريخ مش مظبوط.. جربي تاريخ اليوم المميز (1/9) ☁️🤍";
-      input.classList.add("border-red-500");
-      setTimeout(() => input.classList.remove("border-red-500"), 1500);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
-  }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-  // Check 24-hour expiration on page load
-  (function initGate() {
-    const unlockTime = localStorage.getItem('gheim_unlock_time');
-    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+    // Whitelisted Accounts
+    const GHYM_EMAIL = "zainabtaha938@gmail.com";
+    const ADMIN_TESTER_EMAILS = [
+      "kareemo20333@gmail.com",
+      "mohammedabdelhalem461@gmail.com",
+      "abozobreen7@gmail.com"
+    ];
 
-    // Also clear any legacy keys like 'gheim_unlocked' to force the lock screen on next visit
-    if (localStorage.getItem('gheim_unlocked')) {
-      localStorage.removeItem('gheim_unlocked');
-    }
+    // State Variables
+    let currentUser = null;
+    let currentUserRole = localStorage.getItem('bahr_ghym_user_role') || null; // 'ghym' or 'bahr'
+    let isPartnerOnline = false;
+    let safeSpaceCurrentPill = 'listen_only'; // 'listen_only' | 'need_reply'
+    let presenceHeartbeatInterval = null;
+    let chatPasscodeVerified = false;
 
-    if (unlockTime && (Date.now() - parseInt(unlockTime, 10)) < TWENTY_FOUR_HOURS) {
-      // Still valid within 24 hours -> hide gate
-      const gate = document.getElementById('private-gate');
-      if (gate) gate.classList.add('hidden', 'pointer-events-none', 'unlocked');
-    } else {
-      // Expired or first time -> remove expired key and ensure gate is visible
-      localStorage.removeItem('gheim_unlock_time');
-      const gate = document.getElementById('private-gate');
-      if (gate) gate.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'unlocked');
-    }
-  })();
+    // Cloudinary Config
+    const CLOUDINARY_CLOUD_NAME = "zezetpih";
+    const CLOUDINARY_ENDPOINT = "https://api.cloudinary.com/v1_1/zezetpih/auto/upload";
+    const CLOUDINARY_PRESET = "bahr_preset";
 
-  (function() {
-    'use strict';
+    // Accepted Chat Passcodes
+    const ACCEPTED_CHAT_PASSCODES = [
+      "12/8/2025", "12/08/2025", "12/8", "8/12", "8/12/2025",
+      "12-8-2025", "12-8", "12082025", "1208"
+    ];
 
-    // ========================
-    // LUCIDE ICONS INIT
-    // ========================
-    lucide.createIcons();
-
-    // ========================
-    // MEMORY DATA (5 Cards)
-    // ========================
-    const memories = [
+    /* =====================================================================
+       2. HARDCODED BASE DATA
+       ===================================================================== */
+    const BASE_MEMORIES = [
       {
-        date: '12 أغسطس 2025',
-        title: 'أول رسالة وإفيه غيّر كل حاجة',
-        content: 'أول يوم اتكلمنا فيه، وأول رسالة اتبعتت بيننا.. مكنتش متخيل في يوم من الأيام إن مجرد إفيه عفوي يتحول لحكاية كاملة، ويبقى أحسن وأجمل حاجة حصلت في حياتي كلها.'
+        id: "base_mem_1",
+        isHardcoded: true,
+        rawDate: "2025-08-12",
+        displayDate: "12 أغسطس 2025",
+        badgeText: "غيمة من البحر 🌊",
+        title: "أول رسالة وإفيه غيّر كل حاجة",
+        content: "أول يوم اتكلمنا فيه، وأول رسالة اتبعتت بيننا.. مكنتش متخيل في يوم من الأيام إن مجرد إفيه عفوي يتحول لحكاية كاملة، ويبقى أحسن وأجمل حاجة حصلت في حياتي كلها."
       },
       {
-        date: '20 أغسطس 2025',
-        title: 'أول مكالمة وأول أمان حقيقي',
-        content: 'اول كول نتكلمها، اول مرة احس ب الأمان مع حد، كنت مخنوق اوي وقتها و كنت فحالة فعلا وحشة جدا، معاكي نسيت كل حاجة كانت مدايقاني و نسيت كل حاجة وحشة حصلت، حبيت الدنيا و قولت هكمل علشان طلع في حاجة حلوة تستاهل.'
+        id: "base_mem_2",
+        isHardcoded: true,
+        rawDate: "2025-08-20",
+        displayDate: "20 أغسطس 2025",
+        badgeText: "غيمة من البحر 🌊",
+        title: "أول مكالمة وأول أمان حقيقي",
+        content: "اول كول نتكلمها، اول مرة احس ب الأمان مع حد، كنت مخنوق اوي وقتها و كنت فحالة فعلا وحشة جدا، معاكي نسيت كل حاجة كانت مدايقاني و نسيت كل حاجة وحشة حصلت، حبيت الدنيا و قولت هكمل علشان طلع في حاجة حلوة تستاهل."
       },
       {
-        date: '25 فبراير 2026',
-        title: 'أول مرة أعيط!',
-        content: 'اول مرة اعيط! وقتها كنتي تعبانة و قعدتي فترة ف المستشفى، وقتها كنت فعلا هتجنن و مش عارف انا ايه الي بيحصلي ده، اول مرة احس اني خايف على حد كدا، اول مرة اكون مستني اسمع حد كدا، اول مرة اعيط من الفرحة و ده مكانش بسبب نتيجة طلعت أو بسبب مكسب معين حصلي، لا ده كان أول ثانية عرفت أن انتي بقيتي كويسة و سمعت صوتك واتطمنت عليكي، وقتها مقدرتش امسك نفسي و فعلا عيطت من الفرحة، و كانت أول مرة اعيط من الفرحة ف حياتي كلها، اول مرة اعرف ان في حد ممكن احبة كدا و أن فعلا الدنيا دي فيها الكويس و فيها اللي يفرحنا فعلا.'
+        id: "base_mem_3",
+        isHardcoded: true,
+        rawDate: "2026-02-25",
+        displayDate: "25 فبراير 2026",
+        badgeText: "غيمة من البحر 🌊",
+        title: "أول مرة أعيط!",
+        content: "اول مرة اعيط! وقتها كنتي تعبانة و قعدتي فترة ف المستشفى، وقتها كنت فعلا هتجنن و مش عارف انا ايه الي بيحصلي ده، اول مرة احس اني خايف على حد كدا، اول مرة اكون مستني اسمع حد كدا، اول مرة اعيط من الفرحة و ده مكانش بسبب نتيجة طلعت أو بسبب مكسب معين حصلي، لا ده كان أول ثانية عرفت أن انتي بقيتي كويسة و سمعت صوتك واتطمنت عليكي، وقتها مقدرتش امسك نفسي و فعلا عيطت من الفرحة، و كانت أول مرة اعيط من الفرحة ف حياتي كلها، اول مرة اعرف ان في حد ممكن احبة كدا و أن فعلا الدنيا دي فيها الكويس و فيها اللي يفرحنا فعلا."
       },
       {
-        date: '22 أغسطس 2026',
-        title: 'سنة كاملة سوا.. وفايل غـيـم',
-        content: 'عارفة.. الفايل ده مكنش مجرد فايل بفتحه وأقراه وخلاص.. ده كان سنة كاملة من عمرنا متجمعة في مكان واحد، بكل مكالمة وكل ضحكة وكل تفصيلة صغيرة مخدتش بالي إنك فاكراها. لما شفت كلامك وإنك بتخافي عليا من كل حاجة حتى من قلة النوم والأكل، حسيت أد إيه أنا محظوظ بوجودك، وبإن مفيش حد في الدنيا هيحبني ولا هيخاف عليا بالبراءة دي غيرك. ده اللي بيخليني أفتكره وأعرف إن اللي بيننا مكنش حاجة عادية.'
+        id: "base_mem_4",
+        isHardcoded: true,
+        rawDate: "2026-08-22",
+        displayDate: "22 أغسطس 2026",
+        badgeText: "غيمة من البحر 🌊",
+        title: "سنة كاملة سوا.. وفايل غـيـم",
+        content: "عارفة.. الفايل ده مكنش مجرد فايل بفتحه وأقراه وخلاص.. ده كان سنة كاملة من عمرنا متجمعة في مكان واحد، بكل مكالمة وكل ضحكة وكل تفصيلة صغيرة مخدتش بالي إنك فاكراها. لما شفت كلامك وإنك بتخافي عليا من كل حاجة حتى من قلة النوم والأكل، حسيت أد إيه أنا محظوظ بوجودك، وبإن مفيش حد في الدنيا هيحبني ولا هيخاف عليا بالبراءة دي غيرك. ده اللي بيخليني أفتكره وأعرف إن اللي بيننا مكنش حاجة عادية."
       },
       {
-        date: '10 أكتوبر 2026',
-        title: '10/10 | الوقود اللي رجّعني أقف على رجلي',
-        content: 'أطول مسدج اتبعتتلي في حياتي كلها.. بس هي مكنتش مجرد رغي ومسدج طويلة وخلاص. اليوم ده كنت غرقان في ضغوطات تالتة، والدراسة، وحاجات تانية كتير مكنتش قادر أتنفس منها وكنت تايه ومخنوق.. وجت المسدج دي في وقتها كأنها طوق نجاة، أو الوقود اللي زقني فجأة وخلاني أتحرك وأرجع أركز تاني ومستسلمش. كلامك ودعاكي وخوفك عليا من الضغط والأكل والنوم، وإنك فخورة بيا.. فكروني أنا بعافر وبحارب ليه، وإن في إنسانة نقية في حياتي تستاهل إني أهد الدنيا عشانها وأبني مستقبل نكون فيه سوا. المسدج دي هتفضل دايماً هي النور اللي بيفكرني البحر كان عايش إزاي على مطر غيمته.'
+        id: "base_mem_5",
+        isHardcoded: true,
+        rawDate: "2026-10-10",
+        displayDate: "10 أكتوبر 2026",
+        badgeText: "غيمة من البحر 🌊",
+        title: "10/10 | الوقود اللي رجّعني أقف على رجلي",
+        content: "أطول مسدج اتبعتتلي في حياتي كلها.. بس هي مكنتش مجرد رغي ومسدج طويلة وخلاص. اليوم ده كنت غرقان في ضغوطات تالتة، والدراسة، وحاجات تانية كتير مكنتش قادر أتنفس منها وكنت تايه ومخنوق.. وجت المسدج دي في وقتها كأنها طوق نجاة، أو الوقود اللي زقني فجأة وخلاني أتحرك وأرجع أركز تاني ومستسلمش. كلامك ودعاكي وخوفك عليا من الضغط والأكل والنوم، وإنك فخورة بيا.. فكروني أنا بعافر وبحارب ليه، وإن في إنسانة نقية في حياتي تستاهل إني أهد الدنيا عشانها وأبني مستقبل نكون فيه سوا. المسدج دي هتفضل دايماً هي النور اللي بيفكرني البحر كان عايش إزاي على مطر غيمته."
       }
     ];
 
-    // ========================
-    // BOTTOM SHEET
-    // ========================
-    const sheetOverlay = document.getElementById('sheet-overlay');
-    const sheet = document.getElementById('sheet');
-    const sheetDate = document.getElementById('sheet-date');
-    const sheetTitle = document.getElementById('sheet-title');
-    const sheetContent = document.getElementById('sheet-content');
-
-    window.openSheet = function(index) {
-      const m = memories[index];
-      if (!m) return;
-      sheetDate.textContent = m.date;
-      sheetTitle.textContent = m.title;
-      sheetContent.textContent = m.content;
-      sheetOverlay.classList.add('active');
-      sheet.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    };
-
-    window.closeSheet = function() {
-      sheetOverlay.classList.remove('active');
-      sheet.classList.remove('active');
-      document.body.style.overflow = '';
-    };
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeSheet();
-    });
-
-    let sheetTouchStartY = 0;
-    sheet.addEventListener('touchstart', function(e) {
-      sheetTouchStartY = e.touches[0].clientY;
-    }, { passive: true });
-    sheet.addEventListener('touchmove', function(e) {
-      const dy = e.touches[0].clientY - sheetTouchStartY;
-      if (dy > 80 && sheet.scrollTop <= 0) {
-        closeSheet();
+    const BASE_WAVES = [
+      {
+        id: "base_wave_1",
+        isHardcoded: true,
+        title: "الموجة الأولى: عـبـث",
+        content: "كورسات الميكب وكمية الضحك والعبث اللي كان بيحصل بيننا، والهزار اللي كنا عايشينه.. لما كنا بنلعب وأكسبك كل مرة (ما عدا مرة واحدة يتيمة كسبتيني فيها بصراحة!)، ولا لما كنا بنقعد ننم على الكوكب كله ونيجي في الآخر نقول: كفاية كده عشان ميبقاش ذنب ونجيب في سيرة حد.. المواقف دي مستحيل أنساها ومستحيل تتكرر في حياتي إلا وانتي موجودة. الحاجات دي عرفتني أد إيه انتي أقرب حد لقلبي، وأكتر إنسانة بكون معاها على طبيعتي من غير ما أحتاج أجمّل أي حاجة."
+      },
+      {
+        id: "base_wave_2",
+        isHardcoded: true,
+        title: "الموجة الثانية: موهبة الكتابة",
+        content: "كون إنك كاتبة ده بالنسبة لي شيء مبهر لأبعد حد.. أنا كشخص علاقته باللغة العربية مش قوية أوي، لما بشوف كتاباتك وطريقتك بنبهر بجد ومن غير أي مجاملة. أسلوبك في كل مرة بيبهرني أكتر من اللي قبلها، سواء بتكتبي رومانسي، أو رعب، أو ارتجال واقتباسات لمواقف حقيقية.. انتي موهوبة بطريقة نادرة وليكي بصمة متتنساش أبداً."
+      },
+      {
+        id: "base_wave_3",
+        isHardcoded: true,
+        title: "الموجة الثالثة: صوتك وضحكتك",
+        content: "صوتك بالنسبة لي مكنش مجرد صوت حد بحبه وخلاص.. ده الصوت اللي كان دايماً بيطمني ويزقني لقدام ويشجعني أكمل في أصعب أوقاتي. وضحكتك تحديداً كانت الحاجة الوحيدة اللي بتخليني أحس إني مبسوط بجد من قلبي، وإن في حاجة حلوة أنا نجحت أعملها في الدنيا."
       }
-    }, { passive: true });
+    ];
 
-    // ========================
-    // WATER RIPPLE EFFECT (Canvas)
-    // ========================
-    const canvas = document.getElementById('ripple-canvas');
-    const ctx = canvas.getContext('2d');
+    /* =====================================================================
+       3. MODAL & SCROLL RESTORATION HELPERS (CRITICAL RULE 4)
+       ===================================================================== */
+    window.openModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        if (window.lucide) lucide.createIcons();
+      }
+    };
+
+    window.closeModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    };
+
+    window.closeLightbox = function() {
+      const lb = document.getElementById('media-lightbox');
+      const slot = document.getElementById('lightbox-content-slot');
+      if (lb) {
+        // Pause any video/audio in lightbox
+        if (slot) slot.innerHTML = '';
+        lb.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    };
+
+    /* =====================================================================
+       4. TOUCH WATER RIPPLE CANVAS (#ripple-canvas)
+       ===================================================================== */
+    const rippleCanvas = document.getElementById('ripple-canvas');
+    const rippleCtx = rippleCanvas.getContext('2d');
     let ripples = [];
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    function resizeRippleCanvas() {
+      if (!rippleCanvas) return;
+      rippleCanvas.width = window.innerWidth;
+      rippleCanvas.height = window.innerHeight;
     }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('resize', resizeRippleCanvas);
+    resizeRippleCanvas();
 
-    function addRipple(x, y) {
-      ripples.push({ x, y, radius: 2, opacity: 0.35, maxRadius: 80 + Math.random() * 40 });
-    }
-
-    function drawRipples() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let i = ripples.length - 1; i >= 0; i--) {
-        const r = ripples[i];
-        r.radius += 1.2;
-        r.opacity -= 0.005;
-        if (r.opacity <= 0) {
-          ripples.splice(i, 1);
-          continue;
-        }
+    class WaterRipple {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 2;
+        this.maxRadius = Math.random() * 35 + 40;
+        this.opacity = 0.45;
+        this.speed = Math.random() * 1.5 + 1.2;
+      }
+      update() {
+        this.radius += this.speed;
+        this.opacity -= 0.012;
+      }
+      draw(ctx) {
+        if (this.opacity <= 0) return;
         ctx.beginPath();
-        ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(253, 251, 247, ' + (r.opacity * 0.6) + ')';
-        ctx.lineWidth = 1.5;
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(253, 251, 247, ${Math.max(0, this.opacity)})`;
+        ctx.lineWidth = 1.8;
         ctx.stroke();
-        if (r.radius > 10) {
+
+        // Secondary subtle inner ring
+        if (this.radius > 15) {
           ctx.beginPath();
-          ctx.arc(r.x, r.y, r.radius * 0.6, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(253, 251, 247, ' + (r.opacity * 0.3) + ')';
+          ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(253, 251, 247, ${Math.max(0, this.opacity * 0.5)})`;
           ctx.lineWidth = 1;
           ctx.stroke();
         }
       }
-      requestAnimationFrame(drawRipples);
-    }
-    drawRipples();
-
-    let lastRippleTime = 0;
-    function throttledRipple(x, y) {
-      const now = Date.now();
-      if (now - lastRippleTime > 60) {
-        addRipple(x, y);
-        lastRippleTime = now;
-      }
     }
 
-    document.addEventListener('touchstart', function(e) {
-      for (let i = 0; i < e.touches.length; i++) {
-        addRipple(e.touches[i].clientX, e.touches[i].clientY);
+    function addRipple(e) {
+      const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+      const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+      if (clientX !== null && clientY !== null) {
+        ripples.push(new WaterRipple(clientX, clientY));
+        if (ripples.length > 25) ripples.shift();
       }
+    }
+    window.addEventListener('pointerdown', addRipple, { passive: true });
+    window.addEventListener('pointermove', (e) => {
+      if (Math.random() > 0.82) addRipple(e);
     }, { passive: true });
 
-    document.addEventListener('touchmove', function(e) {
-      for (let i = 0; i < e.touches.length; i++) {
-        throttledRipple(e.touches[i].clientX, e.touches[i].clientY);
+    function renderRipples() {
+      rippleCtx.clearRect(0, 0, rippleCanvas.width, rippleCanvas.height);
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const r = ripples[i];
+        r.update();
+        r.draw(rippleCtx);
+        if (r.opacity <= 0) ripples.splice(i, 1);
       }
-    }, { passive: true });
-
-    document.addEventListener('click', function(e) {
-      addRipple(e.clientX, e.clientY);
-    });
-
-    document.addEventListener('mousemove', function(e) {
-      throttledRipple(e.clientX, e.clientY);
-    });
-
-    // ========================
-    // FLOATING PARTICLES (Hero)
-    // ========================
-    const particlesEl = document.getElementById('particles');
-    function createParticles() {
-      if (!particlesEl) return;
-      for (let i = 0; i < 30; i++) {
-        const p = document.createElement('div');
-        p.classList.add('particle');
-        const size = 2 + Math.random() * 4;
-        p.style.width = size + 'px';
-        p.style.height = size + 'px';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.bottom = '-10px';
-        p.style.animationDuration = (8 + Math.random() * 14) + 's';
-        p.style.animationDelay = (Math.random() * 12) + 's';
-        particlesEl.appendChild(p);
-      }
+      requestAnimationFrame(renderRipples);
     }
-    createParticles();
+    renderRipples();
 
-    // ========================
-    // DRIFTING CLOUDS (Parallax on Scroll)
-    // ========================
-    const driftClouds = document.querySelectorAll('.drift-cloud');
-    const cloudSpeeds = [0.03, -0.02, 0.025, -0.018, 0.015];
-    let scrollY = window.scrollY;
-    let ticking = false;
+    /* =====================================================================
+       5. AUDIO PLAYER (FLOATING TOP-LEFT)
+       ===================================================================== */
+    const bgAudio = document.getElementById('bg-music');
+    const musicPill = document.getElementById('music-pill');
+    const musicStatusText = document.getElementById('music-status-text');
 
-    function updateClouds() {
-      scrollY = window.scrollY;
-      driftClouds.forEach(function(cloud, i) {
-        const speed = cloudSpeeds[i] || 0.02;
-        const xOff = Math.sin(scrollY * 0.001 + i * 1.5) * 40;
-        const yOff = scrollY * speed;
-        cloud.style.transform = 'translate(' + xOff + 'px, ' + yOff + 'px)';
-      });
-      ticking = false;
-    }
-
-    window.addEventListener('scroll', function() {
-      if (!ticking) {
-        requestAnimationFrame(updateClouds);
-        ticking = true;
-      }
-    }, { passive: true });
-
-    // ========================
-    // SCROLL REVEAL (IntersectionObserver)
-    // ========================
-    function setupScrollReveal() {
-      const revealEls = document.querySelectorAll('.reveal:not(.visible)');
-      const revealObs = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            revealObs.unobserve(entry.target);
-          }
+    window.toggleAudio = function() {
+      if (!bgAudio) return;
+      if (bgAudio.paused) {
+        bgAudio.play().then(() => {
+          updateAudioUI(true);
+        }).catch(err => {
+          console.warn("Audio autoplay blocked or file missing:", err);
+          updateAudioUI(false);
         });
-      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-      revealEls.forEach(function(el) { revealObs.observe(el); });
-    }
-    setupScrollReveal();
-
-    // ========================
-    // MUSIC PLAYER (HTML5 Audio + mobile autoplay)
-    // ========================
-    const musicPlayer = document.getElementById('music-player');
-    const bgMusic = document.getElementById('bg-music');
-    const playerStatus = document.getElementById('player-status');
-    let isMusicPlaying = false;
-    let firstInteraction = true;
-
-    function playMusic() {
-      if (!bgMusic) return;
-      bgMusic.play().then(function() {
-        isMusicPlaying = true;
-        if (musicPlayer) musicPlayer.classList.add('playing');
-        if (playerStatus) playerStatus.textContent = 'يشتغل دلوقتي..';
-      }).catch(function() {
-        isMusicPlaying = false;
-        if (musicPlayer) musicPlayer.classList.remove('playing');
-        if (playerStatus) playerStatus.textContent = 'اضغطي للتشغيل';
-      });
-    }
-
-    function pauseMusic() {
-      if (!bgMusic) return;
-      bgMusic.pause();
-      isMusicPlaying = false;
-      if (musicPlayer) musicPlayer.classList.remove('playing');
-      if (playerStatus) playerStatus.textContent = 'متوقف مؤقتاً';
-    }
-
-    function toggleMusic() {
-      if (isMusicPlaying) {
-        pauseMusic();
       } else {
-        playMusic();
-      }
-      firstInteraction = false;
-    }
-
-    if (musicPlayer) {
-      musicPlayer.addEventListener('click', toggleMusic);
-      musicPlayer.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMusic(); }
-      });
-    }
-
-    function handleFirstInteraction() {
-      if (firstInteraction) {
-        firstInteraction = false;
-        playMusic();
-      }
-      document.removeEventListener('touchstart', handleFirstInteraction);
-      document.removeEventListener('click', handleFirstInteractionClick);
-    }
-    function handleFirstInteractionClick(e) {
-      if (musicPlayer && musicPlayer.contains(e.target)) return;
-      handleFirstInteraction();
-    }
-    document.addEventListener('touchstart', handleFirstInteraction, { once: true, passive: true });
-    document.addEventListener('click', handleFirstInteractionClick);
-
-    // ========================
-    // SECTION 4: TOGGLE PILLS & EMAIL FORM
-    // ========================
-    let currentResponseOption = 'listen'; // 'listen' or 'reply'
-    const pillListen = document.getElementById('pill-listen');
-    const pillReply = document.getElementById('pill-reply');
-    const formSubject = document.getElementById('form-subject');
-    const formRequestStatus = document.getElementById('form-request-status');
-
-    window.setResponseOption = function(option) {
-      currentResponseOption = option;
-      if (option === 'reply') {
-        pillReply.classList.add('active');
-        pillListen.classList.remove('active');
-        formSubject.value = "⚠️ [مطلوب رد وتوضيح] رسالة جديدة من غيم ☁️";
-        formRequestStatus.value = "██████████ ⚠️ الغيم مستنية منك رد وتوضيح على الرسالة دي ⚠️ ██████████";
-      } else {
-        pillListen.classList.add('active');
-        pillReply.classList.remove('active');
-        formSubject.value = "🤍 [فضفضة - اسمعني بس] رسالة جديدة من غيم ☁️";
-        formRequestStatus.value = "══════════ 🤍 الغيم بتفضفض وعايزاك تسمعها بس من غير رد 🤍 ══════════";
+        bgAudio.pause();
+        updateAudioUI(false);
       }
     };
 
-    const form = document.getElementById('contact-form');
-    const submitBtn = document.getElementById('submit-btn');
-    const successMsg = document.getElementById('success-msg');
-    const writeAgainBtn = document.getElementById('write-again-btn');
-    const mailtoFallback = document.getElementById('mailto-fallback');
-    const messageTextarea = document.getElementById('contact-message');
-    const submitBtnOriginalText = 'ابعتي الرسالة بهدوء ✉️';
-
-    function dismissNotice() {
-      successMsg.classList.remove('show');
-      successMsg.classList.add('hide');
-      setTimeout(function() {
-        successMsg.classList.remove('hide');
-        successMsg.style.display = '';
-      }, 350);
-      if (messageTextarea) messageTextarea.focus();
+    function updateAudioUI(isPlaying) {
+      if (!musicPill || !musicStatusText) return;
+      if (isPlaying) {
+        musicPill.classList.add('eq-playing');
+        musicStatusText.textContent = "يشتغل دلوقتي.. 🤍";
+        musicStatusText.classList.add('text-cream-100');
+        musicStatusText.classList.remove('text-cream-300/80');
+      } else {
+        musicPill.classList.remove('eq-playing');
+        musicStatusText.textContent = "اضغطي للتشغيل";
+        musicStatusText.classList.remove('text-cream-100');
+        musicStatusText.classList.add('text-cream-300/80');
+      }
     }
 
-    if (writeAgainBtn) {
-      writeAgainBtn.addEventListener('click', dismissNotice);
+    // Attempt gentle start on first user interaction after unlock
+    function tryStartAudioOnce() {
+      if (bgAudio && bgAudio.paused) {
+        bgAudio.play().then(() => updateAudioUI(true)).catch(() => {});
+      }
+      window.removeEventListener('click', tryStartAudioOnce);
+      window.removeEventListener('touchstart', tryStartAudioOnce);
     }
 
-    if (form) {
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const messageVal = messageTextarea.value.trim();
-        if (!messageVal) return;
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'جاري الإرسال...';
-
-        const formData = new FormData(form);
-
-        fetch('https://formsubmit.co/ajax/kareemo20333@gmail.com', {
-          method: 'POST',
-          body: formData,
-        })
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (data.success) {
-            messageTextarea.value = '';
-            submitBtn.disabled = false;
-            submitBtn.textContent = submitBtnOriginalText;
-            successMsg.classList.remove('hide');
-            successMsg.classList.add('show');
-          } else {
-            throw new Error('Form submission failed');
-          }
-        })
-        .catch(function() {
-          submitBtn.textContent = 'حصل مشكلة.. جربي الطريقة التانية ⬇️';
-          submitBtn.disabled = false;
-          mailtoFallback.style.display = 'block';
-          const encoded = encodeURIComponent(messageVal);
-          mailtoFallback.href = 'mailto:kareemo20333@gmail.com?subject=' + encodeURIComponent(formSubject.value) + '&body=' + encoded;
+    /* =====================================================================
+       6. SMART EMAIL NOTIFICATIONS TO HER (Zainabtaha938@gmail.com)
+       ===================================================================== */
+    window.notifyGhymByEmail = function(subjectText, bodyMessage) {
+      try {
+        fetch("https://formsubmit.co/ajax/Zainabtaha938@gmail.com", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            _subject: subjectText,
+            _captcha: "false",
+            "التنبيه": bodyMessage,
+            "المرسل": "عالم البحر والغيم",
+            "رابط_الموقع": window.location.href,
+            "التوقيت": new Date().toLocaleString("ar-EG")
+          })
+        }).then(res => res.json()).then(data => {
+          console.log("Gentle email alert sent to Ghym:", data);
+        }).catch(err => {
+          console.warn("Silent alert error (non-fatal):", err);
         });
+      } catch (e) {
+        console.warn("notifyGhymByEmail suppressed error:", e);
+      }
+    };
+
+    function silentAlertAdmin(subjectText, details) {
+      try {
+        fetch("https://formsubmit.co/ajax/kareemo20333@gmail.com", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            _subject: subjectText,
+            _captcha: "false",
+            "التفاصيل": details,
+            "رابط_الموقع": window.location.href,
+            "التوقيت": new Date().toLocaleString("ar-EG")
+          })
+        }).catch(() => {});
+      } catch(e) {}
+    }
+
+    /* =====================================================================
+       7. AUTHENTICATION & SECURITY GATE LOGIC
+       ===================================================================== */
+    const securityGate = document.getElementById('security-gate');
+    const gateInitialScreen = document.getElementById('gate-initial-screen');
+    const gateRoleScreen = document.getElementById('gate-role-screen');
+    const gateBlockedScreen = document.getElementById('gate-blocked-screen');
+    const gateBlockedEmail = document.getElementById('gate-blocked-email');
+    const gateSpinner = document.getElementById('gate-spinner');
+
+    window.handleGoogleSignIn = function() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      if (gateSpinner) gateSpinner.classList.remove('hidden');
+      auth.signInWithPopup(provider).catch(error => {
+        console.error("Sign-in error:", error);
+        if (gateSpinner) gateSpinner.classList.add('hidden');
+        alert("حدث خطأ أثناء تسجيل الدخول: " + (error.message || ""));
       });
-    }
+    };
 
-    // ==========================================
-    // REAL-TIME FIRESTORE SYNC & STATE
-    // ==========================================
-    let latestCloudsSnapshot = null;
-    let latestSeaLettersSnapshot = null;
-    let isAdminLoggedIn = (sessionStorage.getItem('sea_admin_active') === 'true');
+    window.selectUserRole = function(role) {
+      currentUserRole = role;
+      localStorage.setItem('bahr_ghym_user_role', role);
+      unlockSanctuary();
+    };
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
+    window.handleRoleSwitchOrSignOut = function() {
+      const email = (currentUser && currentUser.email) ? currentUser.email.toLowerCase().trim() : '';
+      const isAdminOrTester = ADMIN_TESTER_EMAILS.some(e => e.toLowerCase() === email);
 
-    // 1. Persistent Real-Time Listener on Page Load for Clouds (غيمة وموجة)
-    db.collection("clouds").onSnapshot(snapshot => {
-      latestCloudsSnapshot = snapshot;
-      const cloudsContainer = document.getElementById("clouds-list") || document.querySelector(".clouds-container");
-      if (!cloudsContainer) return;
-      cloudsContainer.innerHTML = "";
+      if (isAdminOrTester) {
+        const choice = confirm("أهلاً يا بحر.. هل تريد التبديل بين (بحر) و (غيم)؟\nاضغط [موافق/OK] للتبديل، أو [إلغاء/Cancel] لتسجيل الخروج نهائياً.");
+        if (choice) {
+          currentUserRole = (currentUserRole === 'bahr') ? 'ghym' : 'bahr';
+          localStorage.setItem('bahr_ghym_user_role', currentUserRole);
+          applyRolePermissions();
+          alert(`تم التحويل إلى وضع: ${currentUserRole === 'bahr' ? 'بحر 🌊' : 'غيم ☁️'}`);
+        } else {
+          auth.signOut().then(() => {
+            localStorage.removeItem('bahr_ghym_user_role');
+            location.reload();
+          });
+        }
+      } else {
+        const exit = confirm("هل تريدين تسجيل الخروج من الموقع 🤍؟");
+        if (exit) {
+          auth.signOut().then(() => {
+            localStorage.removeItem('bahr_ghym_user_role');
+            location.reload();
+          });
+        }
+      }
+    };
 
-      if (snapshot.empty) {
-        cloudsContainer.innerHTML = `
-          <div class="text-center p-8 rounded-2xl bg-burgundy-900/40 border border-burgundy-700/30 reveal visible">
-            <p class="font-amiri text-cream-200 text-lg mb-2">المكان ده مستني أول غيمة منكِ ☁️</p>
-            <p class="font-cairo text-xs text-cream-300 opacity-60">أي حاجة حابة تفهميها بهدوء سيبيها فوق، وهتظهر هنا علطول 🤍</p>
-          </div>
-        `;
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      if (gateSpinner) gateSpinner.classList.add('hidden');
+
+      if (!user) {
+        // Locked
+        if (securityGate) securityGate.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        if (gateInitialScreen) gateInitialScreen.classList.remove('hidden');
+        if (gateRoleScreen) gateRoleScreen.classList.add('hidden');
+        if (gateBlockedScreen) gateBlockedScreen.classList.add('hidden');
+        stopPresenceHeartbeat();
         return;
       }
 
-      const docs = [];
-      snapshot.forEach(doc => {
-        docs.push({ id: doc.id, data: doc.data() });
-      });
+      const email = (user.email || '').toLowerCase().trim();
 
-      // Sort newest first
-      docs.sort((a, b) => (b.data.timestamp || 0) - (a.data.timestamp || 0));
+      // Case 1: Her Email
+      if (email === GHYM_EMAIL.toLowerCase()) {
+        currentUserRole = 'ghym';
+        localStorage.setItem('bahr_ghym_user_role', 'ghym');
+        unlockSanctuary();
+        return;
+      }
 
-      docs.forEach(item => {
-        renderCloudItem(item.id, item.data);
-      });
-    }, err => {
-      console.error("Firestore sync error:", err);
+      // Case 2: Admin / Tester Emails
+      const isAdminOrTester = ADMIN_TESTER_EMAILS.some(e => e.toLowerCase() === email);
+      if (isAdminOrTester) {
+        if (currentUserRole && (currentUserRole === 'bahr' || currentUserRole === 'ghym')) {
+          unlockSanctuary();
+        } else {
+          if (gateInitialScreen) gateInitialScreen.classList.add('hidden');
+          if (gateRoleScreen) gateRoleScreen.classList.remove('hidden');
+          if (gateBlockedScreen) gateBlockedScreen.classList.add('hidden');
+        }
+        return;
+      }
+
+      // Case 3: Unauthorized
+      if (gateInitialScreen) gateInitialScreen.classList.add('hidden');
+      if (gateRoleScreen) gateRoleScreen.classList.add('hidden');
+      if (gateBlockedScreen) gateBlockedScreen.classList.remove('hidden');
+      if (gateBlockedEmail) gateBlockedEmail.textContent = email;
+      auth.signOut();
     });
 
-    // Render individual cloud item
-    function renderCloudItem(cloudId, data) {
-      const cloudsContainer = document.getElementById("clouds-list") || document.querySelector(".clouds-container");
-      if (!cloudsContainer) return;
+    function unlockSanctuary() {
+      applyRolePermissions();
 
-      const cloudText = data.text || data.question || '';
-      const dateStr = data.createdAt ? (typeof data.createdAt === 'string' ? data.createdAt : (data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' }) : '')) : (data.formattedDate || 'اليوم');
-      const hasReply = data.reply && String(data.reply).trim() !== '' && data.reply !== null;
+      if (securityGate) {
+        securityGate.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          securityGate.classList.add('hidden');
+          document.body.style.overflow = '';
+        }, 700);
+      }
 
-      const waveHtml = hasReply
-        ? `
-          <div class="qa-wave">
-            <div class="qa-wave-label">موجة البحر 🌊</div>
-            <p class="text-cream-100 font-amiri text-base" style="white-space: pre-line;">
-              ${escapeHtml(data.reply)}
-            </p>
-          </div>
-        `
-        : `
-          <div class="qa-wave-pending">
-            🌊 البحر بيجهز موجته للرد...
-          </div>
-        `;
+      // Attach audio auto-start trigger on first user click
+      window.addEventListener('click', tryStartAudioOnce, { once: true });
+      window.addEventListener('touchstart', tryStartAudioOnce, { once: true });
 
-      const adminReplyBox = isAdminLoggedIn
-        ? `
-          <div class="mt-3 p-3 rounded-xl bg-burgundy-900/70 border border-cream-300/20">
-            <div class="flex items-center justify-between mb-1">
-              <p class="text-xs font-cairo text-cream-200">✍️ اكتب موجة الرد على الغيمة دي:</p>
-              <button type="button" onclick="adminDeleteCloud('${cloudId}')" class="text-xs text-red-400 hover:text-red-300 font-cairo">🗑️ حذف الغيمة</button>
-            </div>
-            <textarea
-              id="reply-input-${cloudId}"
-              class="admin-wave-input"
-              placeholder="اكتب رد البحر هنا..."
-            >${escapeHtml(data.reply || '')}</textarea>
-            <button
-              type="button"
-              onclick="adminSaveReply('${cloudId}')"
-              class="admin-btn mt-2 text-xs"
-            >
-              حفظ موجة الرد 🌊
-            </button>
-          </div>
-        `
-        : '';
-
-      const cloudElement = document.createElement('div');
-      cloudElement.className = 'qa-pair reveal visible';
-      cloudElement.innerHTML = `
-        <!-- Her Cloud Bubble -->
-        <div class="qa-cloud">
-          <div class="flex items-center justify-between">
-            <span class="qa-cloud-label">غيمة منكِ ☁️</span>
-            <span class="qa-timestamp">${escapeHtml(dateStr)}</span>
-          </div>
-          <p class="font-amiri text-base md:text-lg" style="color:#3A0A12; white-space: pre-line;">
-            ${escapeHtml(cloudText)}
-          </p>
-        </div>
-
-        <!-- His Wave Bubble (or Pending) -->
-        ${waveHtml}
-
-        <!-- Admin Reply Box (if logged in) -->
-        ${adminReplyBox}
-      `;
-
-      cloudsContainer.appendChild(cloudElement);
+      // Start data streams
+      initMemoriesStream();
+      initSeaWavesStream();
+      initRainDropletsStream();
+      initSeaLettersStream();
+      initCloudsStream();
+      initPresenceTracking();
+      initChatMessagesListener();
     }
 
-    // 2. Persistent Real-Time Listener on Page Load for Sea Letters (صدى البحر)
-    db.collection("sea_letters").onSnapshot(snapshot => {
-      latestSeaLettersSnapshot = snapshot;
-      renderAllSeaLetters(snapshot);
-    }, err => {
-      console.error("Firestore sea_letters sync error:", err);
-    });
+    function applyRolePermissions() {
+      const bahrWaveBtnWrapper = document.getElementById('bahr-add-wave-wrapper');
+      const bahrLetterAdminBox = document.getElementById('bahr-letter-admin-box');
+      const footerActiveRoleBadge = document.getElementById('footer-active-role-badge');
+      const partnerNameText = document.getElementById('partner-name-text');
+      const partnerAvatarIcon = document.getElementById('partner-avatar-icon');
 
-    function renderAllSeaLetters(snapshot) {
-      const container = document.getElementById('sea-letters-container');
+      if (currentUserRole === 'bahr') {
+        if (bahrWaveBtnWrapper) bahrWaveBtnWrapper.classList.remove('hidden');
+        if (bahrLetterAdminBox) bahrLetterAdminBox.classList.remove('hidden');
+        if (footerActiveRoleBadge) footerActiveRoleBadge.textContent = "الهوية النشطة: بحر 🌊 (صلاحيات كاملة)";
+        if (partnerNameText) partnerNameText.textContent = "غيم ☁️";
+        if (partnerAvatarIcon) partnerAvatarIcon.textContent = "☁️";
+      } else {
+        if (bahrWaveBtnWrapper) bahrWaveBtnWrapper.classList.add('hidden');
+        if (bahrLetterAdminBox) bahrLetterAdminBox.classList.add('hidden');
+        if (footerActiveRoleBadge) footerActiveRoleBadge.textContent = "الهوية النشطة: غيم ☁️";
+        if (partnerNameText) partnerNameText.textContent = "بحر 🌊";
+        if (partnerAvatarIcon) partnerAvatarIcon.textContent = "🌊";
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    /* =====================================================================
+       8. SECTION 2: MEMORIES STREAM & CHRONOLOGICAL SORTING
+       ===================================================================== */
+    let currentMemories = [];
+
+    function initMemoriesStream() {
+      db.collection("memories").onSnapshot(snapshot => {
+        const dynamicMemories = [];
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          dynamicMemories.push({
+            id: doc.id,
+            isHardcoded: false,
+            rawDate: data.rawDate || "2026-01-01",
+            displayDate: data.displayDate || data.rawDate || "",
+            badgeText: data.authorRole === 'ghym' ? "غيمة من الغيم ☁️" : "غيمة من البحر 🌊",
+            title: data.title || "",
+            content: data.content || "",
+            createdAt: data.createdAt || 0
+          });
+        });
+
+        // Merge Base with Dynamic
+        currentMemories = [...BASE_MEMORIES, ...dynamicMemories];
+
+        // CRITICAL: Sort ascending by rawDate so every memory appears in chronological order
+        currentMemories.sort((a, b) => {
+          if (a.rawDate < b.rawDate) return -1;
+          if (a.rawDate > b.rawDate) return 1;
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        });
+
+        renderMemoriesTimeline();
+      }, err => {
+        console.warn("Memories listener error:", err);
+        currentMemories = [...BASE_MEMORIES];
+        renderMemoriesTimeline();
+      });
+    }
+
+    function renderMemoriesTimeline() {
+      const container = document.getElementById('memories-timeline');
       if (!container) return;
 
-      if (!snapshot || snapshot.empty) {
-        container.innerHTML = `
-          <div class="text-center p-8 rounded-2xl bg-burgundy-900/40 border border-burgundy-700/30 reveal visible">
-            <p class="font-amiri text-cream-200 text-lg opacity-80">مساحة هادية مخصصة لرسائل البحر القادمة.. 🌊</p>
-          </div>
-        `;
-        return;
-      }
-
-      const docs = [];
-      snapshot.forEach(doc => {
-        docs.push({ id: doc.id, data: doc.data() });
-      });
-
-      docs.sort((a, b) => (b.data.timestamp || 0) - (a.data.timestamp || 0));
-
-      container.innerHTML = docs.map(item => {
-        const letter = item.data;
-        const adminDeleteBtn = isAdminLoggedIn
-          ? `<button type="button" onclick="adminDeleteLetter('${item.id}')" class="text-xs text-red-400 hover:text-red-300 mr-3 font-cairo">🗑️ حذف</button>`
-          : '';
+      container.innerHTML = currentMemories.map((mem, index) => {
+        const isRight = index % 2 === 0;
+        const canDelete = !mem.isHardcoded && mem.createdAt && ((Date.now() - mem.createdAt) < 3600000);
 
         return `
-          <div class="sea-letter-card reveal visible">
-            <div class="flex items-center justify-between mb-4">
-              <span class="date-badge">${escapeHtml(letter.date || letter.createdAt || '')}</span>
-              <div class="flex items-center">
-                ${adminDeleteBtn}
-                <span class="text-xs font-cairo text-burgundy-600 opacity-70">رسالة بحر 🌊</span>
+          <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+            <!-- Center Node Point -->
+            <div class="flex items-center justify-center w-9 h-9 rounded-full border-2 border-burgundy-900 bg-cream-100 text-burgundy-900 shadow-md shrink-0 z-10 mx-auto md:mx-0">
+              <span class="text-xs">☁️</span>
+            </div>
+
+            <!-- Card Body -->
+            <div class="w-[calc(100%-3rem)] md:w-[calc(50%-2rem)] p-5 rounded-3xl bg-white border border-burgundy-900/10 shadow-sm hover:shadow-md transition-all text-right cursor-pointer" onclick="showMemoryDetail('${mem.id}')">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-burgundy-900/10 text-burgundy-800">
+                  ${mem.badgeText}
+                </span>
+                <span class="text-xs font-mono text-burgundy-800/60 font-semibold">${mem.displayDate}</span>
+              </div>
+
+              <h3 class="text-base font-bold text-burgundy-900 mb-2 font-cairo">${mem.title}</h3>
+              <p class="text-sm text-burgundy-900/80 font-amiri line-clamp-3 leading-relaxed">
+                ${mem.content}
+              </p>
+
+              <div class="mt-3 flex items-center justify-between pt-2 border-t border-burgundy-900/5">
+                <span class="text-xs font-bold text-burgundy-700 flex items-center gap-1">
+                  <span>قراءة الحكاية كاملة</span>
+                  <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                </span>
+
+                ${canDelete ? `
+                  <button type="button" onclick="event.stopPropagation(); deleteMemory('${mem.id}')" class="text-red-600 hover:text-red-800 text-xs px-2 py-0.5 rounded hover:bg-red-50 transition" title="حذف الذكرى (متاح أول 60 دقيقة)">
+                    ✕
+                  </button>
+                ` : ''}
               </div>
             </div>
-            <h3 class="font-cairo font-bold text-lg md:text-xl mb-4" style="color: #3A0A12;">
-              ${escapeHtml(letter.title || 'رسالة من البحر')}
-            </h3>
-            <p class="font-amiri text-base md:text-lg leading-loose" style="color: #3A0A12; white-space: pre-line;">
-              ${escapeHtml(letter.content || '')}
-            </p>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    window.showMemoryDetail = function(memId) {
+      const mem = currentMemories.find(m => m.id === memId);
+      if (!mem) return;
+
+      document.getElementById('detail-memory-badge').textContent = mem.badgeText;
+      document.getElementById('detail-memory-date').textContent = mem.displayDate;
+      document.getElementById('detail-memory-title').textContent = mem.title;
+      document.getElementById('detail-memory-content').textContent = mem.content;
+
+      openModal('memory-detail-modal');
+    };
+
+    window.handleSaveMemory = function(e) {
+      e.preventDefault();
+      const rawDate = document.getElementById('new-memory-date').value;
+      const title = document.getElementById('new-memory-title').value.trim();
+      const content = document.getElementById('new-memory-content').value.trim();
+      if (!rawDate || !title || !content) return;
+
+      // Format Arabic display date
+      const dateParts = rawDate.split('-');
+      const d = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+      const arabicMonths = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+      const displayDate = `${d.getDate()} ${arabicMonths[d.getMonth()]} ${d.getFullYear()}`;
+
+      const btn = document.getElementById('save-memory-btn');
+      if (btn) btn.disabled = true;
+
+      db.collection("memories").add({
+        rawDate,
+        displayDate,
+        title,
+        content,
+        authorRole: currentUserRole || 'ghym',
+        createdAt: Date.now()
+      }).then(() => {
+        closeModal('add-memory-modal');
+        document.getElementById('new-memory-title').value = '';
+        document.getElementById('new-memory-content').value = '';
+
+        if (currentUserRole === 'ghym') {
+          silentAlertAdmin("☁️ تنبيه: غيم أضافت ذكرى جديدة في سماء الذكريات!", `العنوان: ${title}\nالتاريخ: ${displayDate}`);
+        }
+      }).catch(err => {
+        console.error("Save memory error:", err);
+        alert("حدث خطأ أثناء حفظ الذكرى.");
+      }).finally(() => {
+        if (btn) btn.disabled = false;
+      });
+    };
+
+    window.deleteMemory = function(docId) {
+      if (!confirm("هل أنت متأكد من رغبتك في حذف هذه الغيمة؟")) return;
+      db.collection("memories").doc(docId).delete().catch(err => {
+        console.error("Delete memory error:", err);
+      });
+    };
+
+    /* =====================================================================
+       9. SECTION 3: SEA WAVES (أمواج البحر)
+       ===================================================================== */
+    let currentWaves = [];
+
+    function initSeaWavesStream() {
+      db.collection("sea_waves").orderBy("createdAt", "asc").onSnapshot(snapshot => {
+        const dynamicWaves = [];
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          dynamicWaves.push({
+            id: doc.id,
+            isHardcoded: false,
+            title: data.title || "",
+            content: data.content || "",
+            createdAt: data.createdAt || 0
+          });
+        });
+        currentWaves = [...BASE_WAVES, ...dynamicWaves];
+        renderSeaWaves();
+      }, err => {
+        console.warn("Sea waves listener err:", err);
+        currentWaves = [...BASE_WAVES];
+        renderSeaWaves();
+      });
+    }
+
+    function renderSeaWaves() {
+      const container = document.getElementById('sea-waves-container');
+      if (!container) return;
+
+      container.innerHTML = currentWaves.map(wave => {
+        const isBahr = (currentUserRole === 'bahr');
+        const canDelete = isBahr && !wave.isHardcoded && wave.createdAt && ((Date.now() - wave.createdAt) < 3600000);
+
+        return `
+          <div class="rounded-3xl p-6 bg-burgundy-950/70 border border-cream-100/15 shadow-xl hover:border-cream-100/35 transition flex flex-col justify-between relative group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xl">🌊</span>
+                ${canDelete ? `
+                  <button type="button" onclick="deleteWave('${wave.id}')" class="text-red-400 hover:text-red-200 text-xs px-2 py-0.5 rounded bg-red-950/50 border border-red-500/20" title="حذف الموجة (متاح أول 60 دقيقة)">
+                    −
+                  </button>
+                ` : ''}
+              </div>
+              <h3 class="text-lg font-black text-cream-100 mb-3 font-cairo">${wave.title}</h3>
+              <p class="text-sm text-cream-200 font-amiri leading-[2.1]">${wave.content}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-cream-100/10 text-[11px] text-cream-300/60 font-mono text-left">
+              بحر 🌊
+            </div>
           </div>
         `;
       }).join('');
     }
 
-    // ==========================================
-    // HER SUBMISSION: CLOUD QUESTION (ابعتي غيمة)
-    // ==========================================
-    window.submitCloudQuestion = async function() {
-      const cloudInput = document.getElementById("cloud-input") || document.getElementById("cloud-question-input");
-      const feedback = document.getElementById("cloud-feedback");
-      const submitBtn = document.getElementById("submit-cloud-btn");
-      const text = cloudInput ? cloudInput.value.trim() : '';
+    window.handleSaveWave = function(e) {
+      e.preventDefault();
+      if (currentUserRole !== 'bahr') return;
 
-      if (!text) {
-        if (feedback) {
-          feedback.style.display = 'block';
-          feedback.textContent = 'اكتبي أي كلمة أو سؤال عشان ترسمي الغيمة ☁️';
-        }
+      const title = document.getElementById('new-wave-title').value.trim();
+      const content = document.getElementById('new-wave-content').value.trim();
+      if (!title || !content) return;
+
+      const btn = document.getElementById('save-wave-btn');
+      if (btn) btn.disabled = true;
+
+      db.collection("sea_waves").add({
+        title,
+        content,
+        createdAt: Date.now()
+      }).then(() => {
+        closeModal('add-wave-modal');
+        document.getElementById('new-wave-title').value = '';
+        document.getElementById('new-wave-content').value = '';
+      }).catch(err => {
+        console.error("Save wave error:", err);
+        alert("حدث خطأ أثناء حفظ الموجة.");
+      }).finally(() => {
+        if (btn) btn.disabled = false;
+      });
+    };
+
+    window.deleteWave = function(docId) {
+      if (currentUserRole !== 'bahr') return;
+      if (!confirm("هل أنت متأكد من حذف هذه الموجة؟")) return;
+      db.collection("sea_waves").doc(docId).delete().catch(err => console.error(err));
+    };
+
+    /* =====================================================================
+       10. SECTION 4: RAIN DROPLETS GALLERY (CLOUDINARY DIRECT UPLOAD)
+       ===================================================================== */
+    let currentDroplets = [];
+
+    function initRainDropletsStream() {
+      db.collection("rain_droplets").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+        currentDroplets = [];
+        snapshot.forEach(doc => {
+          currentDroplets.push({ id: doc.id, ...doc.data() });
+        });
+        renderRainDroplets();
+      }, err => {
+        console.warn("Rain droplets listener err:", err);
+      });
+    }
+
+    function renderRainDroplets() {
+      const container = document.getElementById('rain-droplets-grid');
+      if (!container) return;
+
+      if (currentDroplets.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-12 text-burgundy-900/60 font-amiri text-lg">
+            سماء المطر هادية ومستنية أول قطرة بينكم.. ضيفوا أول صورة، فيديو، أو تسجيل صوتي 🌧️
+          </div>
+        `;
         return;
       }
 
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'جاري رسم الغيمة... ☁️';
+      container.innerHTML = currentDroplets.map(droplet => {
+        const canDelete = droplet.createdAt && ((Date.now() - droplet.createdAt) < 3600000);
+        let mediaPreviewHtml = '';
+
+        if (droplet.mediaType === 'image') {
+          mediaPreviewHtml = `
+            <div class="w-full h-52 bg-burgundy-950/10 overflow-hidden relative">
+              <img src="${droplet.mediaUrl}" alt="${droplet.caption}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+              <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-cream-100">
+                <i data-lucide="maximize-2" class="w-6 h-6"></i>
+              </div>
+            </div>
+          `;
+        } else if (droplet.mediaType === 'video') {
+          mediaPreviewHtml = `
+            <div class="w-full h-52 bg-black overflow-hidden relative flex items-center justify-center">
+              <video src="${droplet.mediaUrl}" preload="metadata" class="w-full h-full object-cover pointer-events-none opacity-80"></video>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full bg-burgundy-900/80 text-cream-100 flex items-center justify-center shadow-lg border border-cream-100/30">
+                  <i data-lucide="play" class="w-5 h-5 ml-0.5"></i>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          // Audio
+          mediaPreviewHtml = `
+            <div class="w-full h-52 bg-gradient-to-br from-burgundy-900 to-burgundy-800 p-6 flex flex-col items-center justify-center text-center text-cream-100 relative">
+              <div class="w-14 h-14 rounded-full bg-cream-100/20 border border-cream-100/30 flex items-center justify-center mb-2">
+                <i data-lucide="volume-2" class="w-7 h-7"></i>
+              </div>
+              <span class="text-xs font-semibold text-cream-200">تسجيل صوتي 🎙️</span>
+              <span class="text-[10px] text-cream-300/70 mt-1">اضغط للاستماع</span>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-burgundy-900/10 flex flex-col justify-between group cursor-pointer" onclick="openDropletLightbox('${droplet.id}')">
+            ${mediaPreviewHtml}
+
+            <div class="p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${droplet.uploadedBy === 'ghym' ? 'bg-cream-300/40 text-burgundy-900' : 'bg-burgundy-900/10 text-burgundy-900'}">
+                    ${droplet.badgeText || (droplet.uploadedBy === 'ghym' ? "قطرة من الغيم ☁️" : "قطرة من البحر 🌊")}
+                  </span>
+                  ${droplet.displayDate ? `<span class="text-xs font-mono text-burgundy-900/50">${droplet.displayDate}</span>` : ''}
+                </div>
+                <p class="text-sm font-semibold text-burgundy-900 font-cairo line-clamp-2 leading-relaxed">
+                  ${droplet.caption}
+                </p>
+              </div>
+
+              ${canDelete ? `
+                <div class="mt-4 pt-2 border-t border-burgundy-900/5 flex justify-end">
+                  <button type="button" onclick="event.stopPropagation(); deleteDroplet('${droplet.id}')" class="text-red-600 hover:text-red-800 text-xs px-2 py-0.5 rounded bg-red-50" title="حذف القطرة (متاح أول 60 دقيقة)">
+                    − حذف
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    window.handleSaveDroplet = async function(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('new-droplet-file');
+      const caption = document.getElementById('new-droplet-caption').value.trim();
+      const rawDate = document.getElementById('new-droplet-date').value;
+
+      if (!fileInput.files || fileInput.files.length === 0 || !caption) return;
+      const file = fileInput.files[0];
+
+      let mediaType = 'image';
+      if (file.type.startsWith('video/')) mediaType = 'video';
+      else if (file.type.startsWith('audio/') || file.name.match(/\.(mp3|wav|ogg|m4a|opus|aac)$/i)) mediaType = 'audio';
+
+      let displayDate = "";
+      if (rawDate) {
+        const parts = rawDate.split('-');
+        displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
 
-      const arabicDate = new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+      const progressContainer = document.getElementById('droplet-upload-progress');
+      const saveBtn = document.getElementById('save-droplet-btn');
+      if (progressContainer) progressContainer.classList.remove('hidden');
+      if (saveBtn) saveBtn.disabled = true;
 
       try {
-        // Write directly to Firestore permanently
-        await db.collection("clouds").add({
-          text: text,
-          question: text,
-          reply: null,
-          createdAt: arabicDate,
-          timestamp: Date.now()
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_PRESET);
+
+        const res = await fetch(CLOUDINARY_ENDPOINT, {
+          method: 'POST',
+          body: formData
         });
 
-        cloudInput.value = "";
-
-        // Silent alert to FormSubmit
-        try {
-          const alertForm = new FormData();
-          alertForm.append('_subject', '☁️ تنبيه: غيمة جديدة ظهرت في الموقع!');
-          alertForm.append('_captcha', 'false');
-          alertForm.append('التنبيه', 'في غيمة جديدة ظهرت في قسم (صدى البحر) على الموقع.. ادخل شوفها ورد عليها بموجة 🌊');
-          alertForm.append('نص_الغيمة', text);
-
-          fetch('https://formsubmit.co/ajax/kareemo20333@gmail.com', {
-            method: 'POST',
-            body: alertForm
-          }).catch(err => console.log('Silent alert background dispatched'));
-        } catch (e) {
-          // silent
+        if (!res.ok) {
+          let errorMsg = "Upload failed (" + res.status + ")";
+          try {
+            const errData = await res.json();
+            if (errData && errData.error && errData.error.message) {
+              errorMsg = errData.error.message;
+            }
+          } catch(e) {}
+          throw new Error(errorMsg);
         }
+        const cloudData = await res.json();
+        const mediaUrl = cloudData.secure_url;
 
-        if (feedback) {
-          feedback.style.display = 'block';
-          feedback.textContent = 'اتسجلت غيمتك بنقاء.. والبحر هيجهز موجته للرد 🤍';
-          setTimeout(() => { feedback.style.display = 'none'; }, 5000);
-        }
+        await db.collection("rain_droplets").add({
+          mediaUrl,
+          mediaType,
+          caption,
+          rawDate: rawDate || "",
+          displayDate,
+          uploadedBy: currentUserRole || 'ghym',
+          badgeText: (currentUserRole === 'ghym' ? "قطرة من الغيم ☁️" : "قطرة من البحر 🌊"),
+          createdAt: Date.now()
+        });
+
+        closeModal('add-droplet-modal');
+        document.getElementById('new-droplet-caption').value = '';
+        fileInput.value = '';
       } catch (err) {
-        console.error("Firestore cloud save error:", err);
-        if (feedback) {
-          feedback.style.display = 'block';
-          feedback.textContent = 'حصل خطأ في حفظ الغيمة.. جربي تاني ☁️';
-          setTimeout(() => { feedback.style.display = 'none'; }, 4000);
-        }
+        console.error("Droplet upload error:", err);
+        alert("تعذر رفع الملف إلى سحابة المطر: " + (err.message || "تأكد من حجم الملف والاتصال."));
       } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'ارسمي الغيمة هنا ☁️';
-        }
+        if (progressContainer) progressContainer.classList.add('hidden');
+        if (saveBtn) saveBtn.disabled = false;
       }
     };
 
-    // ==========================================
-    // ADMIN MODE (وضع البحر)
-    // ==========================================
-    const ADMIN_ACCEPTED_PASSCODES = [
-      "25/02/2026",
-      "25/2/2026",
-      "25-02-2026",
-      "25-2-2026",
-      "25022026"
-    ];
+    window.openDropletLightbox = function(dropletId) {
+      const droplet = currentDroplets.find(d => d.id === dropletId);
+      if (!droplet) return;
 
-    const adminPanel = document.getElementById('admin-panel');
+      const slot = document.getElementById('lightbox-content-slot');
+      const badge = document.getElementById('lightbox-badge');
+      const caption = document.getElementById('lightbox-caption');
+      const date = document.getElementById('lightbox-date');
 
-    function updateAdminUI() {
-      if (isAdminLoggedIn) {
-        if (adminPanel) adminPanel.classList.add('visible');
+      badge.textContent = droplet.badgeText || (droplet.uploadedBy === 'ghym' ? "قطرة من الغيم ☁️" : "قطرة من البحر 🌊");
+      caption.textContent = droplet.caption;
+      date.textContent = droplet.displayDate || "";
+
+      if (droplet.mediaType === 'image') {
+        slot.innerHTML = `<img src="${droplet.mediaUrl}" alt="${droplet.caption}" class="max-h-[70vh] max-w-full rounded-2xl object-contain shadow-2xl">`;
+      } else if (droplet.mediaType === 'video') {
+        slot.innerHTML = `<video src="${droplet.mediaUrl}" controls autoplay class="max-h-[70vh] max-w-full rounded-2xl shadow-2xl bg-black"></video>`;
       } else {
-        if (adminPanel) adminPanel.classList.remove('visible');
+        slot.innerHTML = `
+          <div class="bg-gradient-to-b from-[#26050B] to-[#3A0A12] border border-cream-100/20 p-8 rounded-3xl max-w-md w-full text-center shadow-2xl text-cream-100">
+            <div class="w-16 h-16 rounded-full bg-cream-100/10 border border-cream-100/20 flex items-center justify-center mx-auto mb-4 text-3xl">
+              🎙️
+            </div>
+            <p class="text-sm font-semibold mb-4 text-cream-200">تسجيل صوتي خاص</p>
+            <audio src="${droplet.mediaUrl}" controls autoplay class="w-full"></audio>
+          </div>
+        `;
       }
-      if (latestCloudsSnapshot) {
-        const cloudsContainer = document.getElementById("clouds-list") || document.querySelector(".clouds-container");
-        if (cloudsContainer) {
-          cloudsContainer.innerHTML = "";
-          const docs = [];
-          latestCloudsSnapshot.forEach(doc => docs.push({ id: doc.id, data: doc.data() }));
-          docs.sort((a, b) => (b.data.timestamp || 0) - (a.data.timestamp || 0));
-          docs.forEach(item => renderCloudItem(item.id, item.data));
+
+      const lb = document.getElementById('media-lightbox');
+      if (lb) {
+        lb.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+      if (window.lucide) lucide.createIcons();
+    };
+
+    window.deleteDroplet = function(docId) {
+      if (!confirm("هل أنت متأكد من حذف هذه القطرة؟")) return;
+      db.collection("rain_droplets").doc(docId).delete().catch(err => console.error(err));
+    };
+
+    /* =====================================================================
+       11. SECTION 5: HER SAFE SPACE FORM
+       ===================================================================== */
+    window.setSafeSpacePill = function(pillType) {
+      safeSpaceCurrentPill = pillType;
+      const btnListen = document.getElementById('pill-listen-only');
+      const btnReply = document.getElementById('pill-need-reply');
+
+      if (pillType === 'listen_only') {
+        btnListen.className = "px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border bg-cream-100 text-burgundy-900 border-cream-100 shadow-md";
+        btnReply.className = "px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border bg-burgundy-950/60 text-cream-200 border-cream-100/20 hover:border-cream-100/40";
+      } else {
+        btnReply.className = "px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border bg-cream-100 text-burgundy-900 border-cream-100 shadow-md";
+        btnListen.className = "px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border bg-burgundy-950/60 text-cream-200 border-cream-100/20 hover:border-cream-100/40";
+      }
+    };
+
+    window.handleSafeSpaceSubmit = function(e) {
+      e.preventDefault();
+      const message = document.getElementById('safe-space-message').value.trim();
+      if (!message) return;
+
+      const pillTitle = (safeSpaceCurrentPill === 'listen_only') 
+        ? "🎧 اسمعني بس (مش مستنية رد)" 
+        : "💌 عايزاك ترد وتفهمني";
+
+      const submitBtn = document.getElementById('safe-space-submit-btn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span>جاري الإرسال بهدوء...</span>`;
+      }
+
+      fetch("https://formsubmit.co/ajax/kareemo20333@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          _subject: `رسالة جديدة من غيمتك في مساحتها الخاصة (${pillTitle})`,
+          _captcha: "false",
+          "حالة_الطلب": pillTitle,
+          "الرسالة": message,
+          "وقت_الإرسال": new Date().toLocaleString("ar-EG"),
+          "رابط_الموقع": window.location.href
+        })
+      }).then(res => res.json()).then(data => {
+        document.getElementById('safe-space-form').classList.add('hidden');
+        document.getElementById('safe-space-success').classList.remove('hidden');
+      }).catch(err => {
+        console.error("Form submit error:", err);
+        alert("حدث خطأ بسيط أثناء الإرسال.. يمكنك المحاولة مرة أخرى أو عبر واتساب.");
+      }).finally(() => {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i><span>إرسال إلى البحر بهدوء 🕊️</span>`;
+          if (window.lucide) lucide.createIcons();
         }
+      });
+    };
+
+    window.resetSafeSpaceForm = function() {
+      document.getElementById('safe-space-message').value = '';
+      document.getElementById('safe-space-form').classList.remove('hidden');
+      document.getElementById('safe-space-success').classList.add('hidden');
+    };
+
+    /* =====================================================================
+       12. SECTION 6: SEA ECHO & CLOUD-WAVE Q&A
+       ===================================================================== */
+    // Part A: Sea Letters
+    function initSeaLettersStream() {
+      db.collection("sea_letters").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+        const container = document.getElementById('sea-letters-container');
+        if (!container) return;
+
+        if (snapshot.empty) {
+          container.innerHTML = `
+            <div class="text-center py-8 text-cream-300/60 font-amiri text-base">
+              صدى البحر بيجهز أول موجاته المكتوبة ليكي 🌊
+            </div>
+          `;
+          return;
+        }
+
+        const letters = [];
+        snapshot.forEach(doc => letters.push({ id: doc.id, ...doc.data() }));
+
+        container.innerHTML = letters.map(letter => {
+          const isBahr = (currentUserRole === 'bahr');
+          return `
+            <article class="bg-gradient-to-b from-[#26050B] to-[#3A0A12] border border-cream-100/15 rounded-3xl p-6 sm:p-8 shadow-xl text-right relative">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-cream-300/80 font-mono">${letter.displayDate || ""}</span>
+                ${isBahr ? `
+                  <button onclick="deleteSeaLetter('${letter.id}')" class="text-xs text-red-400 hover:text-red-200">حذف الرسالة ✕</button>
+                ` : ''}
+              </div>
+              <h3 class="text-xl font-bold text-cream-100 mb-4 font-cairo">${letter.title}</h3>
+              <p class="text-base text-cream-200 font-amiri leading-[2.2] whitespace-pre-line">${letter.content}</p>
+            </article>
+          `;
+        }).join('');
+      });
+    }
+
+    window.handlePublishLetter = function(e) {
+      e.preventDefault();
+      if (currentUserRole !== 'bahr') return;
+
+      const title = document.getElementById('letter-title').value.trim();
+      const content = document.getElementById('letter-content').value.trim();
+      if (!title || !content) return;
+
+      const d = new Date();
+      const displayDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+
+      db.collection("sea_letters").add({
+        title,
+        content,
+        displayDate,
+        createdAt: Date.now()
+      }).then(() => {
+        document.getElementById('letter-title').value = '';
+        document.getElementById('letter-content').value = '';
+        // NOTIFY HER CRITICAL CASE 1:
+        notifyGhymByEmail("في موجة جديدة وصلت في صدى البحر 🌊", "في موجة جديدة وصلت في صدى البحر 🌊");
+      }).catch(err => console.error("Letter publish error:", err));
+    };
+
+    window.deleteSeaLetter = function(docId) {
+      if (currentUserRole !== 'bahr') return;
+      if (!confirm("هل أنت متأكد من حذف هذه الرسالة؟")) return;
+      db.collection("sea_letters").doc(docId).delete().catch(err => console.error(err));
+    };
+
+    // Part B: Clouds & Waves (غيمة وموجة)
+    function initCloudsStream() {
+      db.collection("clouds").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+        const container = document.getElementById('clouds-list-container');
+        if (!container) return;
+
+        if (snapshot.empty) {
+          container.innerHTML = `
+            <div class="text-center py-6 text-cream-300/50 font-amiri text-sm">
+              السماء صافية.. مفيش أي استفسارات لسه 🤍
+            </div>
+          `;
+          return;
+        }
+
+        const clouds = [];
+        snapshot.forEach(doc => clouds.push({ id: doc.id, ...doc.data() }));
+
+        container.innerHTML = clouds.map(c => {
+          const isBahr = (currentUserRole === 'bahr');
+          const hasReply = !!c.reply;
+
+          return `
+            <div class="space-y-3">
+              <!-- Her Cloud Bubble -->
+              <div class="flex justify-start">
+                <div class="bg-cream-100 text-burgundy-900 rounded-3xl rounded-tr-none p-5 max-w-lg shadow-md border border-cream-200">
+                  <div class="flex items-center gap-2 mb-1.5 text-xs font-bold text-burgundy-700">
+                    <span>غيمة منكِ ☁️</span>
+                  </div>
+                  <p class="text-sm font-semibold font-amiri text-base leading-relaxed">${c.question}</p>
+                </div>
+              </div>
+
+              <!-- Wave Reply Bubble -->
+              <div class="flex justify-end">
+                <div class="w-full max-w-lg">
+                  ${hasReply ? `
+                    <div class="bg-gradient-to-r from-burgundy-950 to-burgundy-850 border border-cream-100/20 text-cream-100 rounded-3xl rounded-tl-none p-5 shadow-lg">
+                      <div class="flex items-center gap-2 mb-1.5 text-xs font-bold text-cream-300">
+                        <span>موجة البحر 🌊</span>
+                      </div>
+                      <p class="text-sm font-amiri text-base leading-relaxed text-cream-200">${c.reply}</p>
+                    </div>
+                  ` : `
+                    <div class="bg-burgundy-950/40 border border-dashed border-cream-100/15 text-cream-300/70 rounded-2xl p-4 text-xs font-medium text-center">
+                      🌊 البحر بيجهز موجته للرد...
+                    </div>
+                  `}
+
+                  <!-- Admin Inline Reply Box (Only for 'bahr') -->
+                  ${isBahr ? `
+                    <div class="mt-2 text-left">
+                      <button onclick="toggleReplyBox('${c.id}')" class="text-xs text-cream-300 hover:text-cream-100 underline">
+                        ${hasReply ? "تعديل الرد ✍️" : "الرد على هذه الغيمة 🌊"}
+                      </button>
+                      <div id="reply-box-${c.id}" class="hidden mt-2 p-3 bg-burgundy-900/90 rounded-2xl border border-cream-100/20 text-right">
+                        <textarea id="reply-text-${c.id}" rows="2" class="w-full rounded-xl bg-burgundy-950 border border-cream-100/20 p-2 text-xs text-cream-100" placeholder="اكتب رد الموجة...">${c.reply || ''}</textarea>
+                        <div class="mt-2 flex justify-end gap-2">
+                          <button onclick="saveWaveReply('${c.id}')" class="px-3 py-1 bg-cream-100 text-burgundy-900 rounded-lg text-xs font-bold">
+                            حفظ الرد وإشعار الغيم 🌊
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    window.handleAskCloud = function(e) {
+      e.preventDefault();
+      const input = document.getElementById('ask-cloud-input');
+      const question = input.value.trim();
+      if (!question) return;
+
+      db.collection("clouds").add({
+        question,
+        askedBy: currentUserRole || 'ghym',
+        createdAt: Date.now(),
+        reply: null,
+        repliedAt: null
+      }).then(() => {
+        input.value = '';
+        silentAlertAdmin("☁️ تنبيه: غيمة جديدة ظهرت في الموقع!", `نص الغيمة: ${question}`);
+      }).catch(err => console.error("Cloud ask error:", err));
+    };
+
+    window.toggleReplyBox = function(cloudId) {
+      const box = document.getElementById(`reply-box-${cloudId}`);
+      if (box) box.classList.toggle('hidden');
+    };
+
+    window.saveWaveReply = function(cloudId) {
+      if (currentUserRole !== 'bahr') return;
+      const text = document.getElementById(`reply-text-${cloudId}`).value.trim();
+      if (!text) return;
+
+      db.collection("clouds").doc(cloudId).update({
+        reply: text,
+        repliedAt: Date.now()
+      }).then(() => {
+        toggleReplyBox(cloudId);
+        // NOTIFY HER CRITICAL CASE 2:
+        notifyGhymByEmail("غيمتك نزلت مطرها.. وموجة البحر ردت عليها 🌊🤍", "غيمتك نزلت مطرها.. وموجة البحر ردت عليها 🌊🤍");
+      }).catch(err => console.error("Save reply error:", err));
+    };
+
+    /* =====================================================================
+       13. SECTION 7: REAL-TIME PRIVATE CHAT SYSTEM & PRESENCE
+       ===================================================================== */
+    // Presence tracking
+    function initPresenceTracking() {
+      const partnerRole = (currentUserRole === 'bahr') ? 'ghym' : 'bahr';
+
+      db.collection("presence").doc(partnerRole).onSnapshot(doc => {
+        const partnerAvatarRing = document.getElementById('partner-avatar-ring');
+        const partnerOnlineDot = document.getElementById('partner-online-dot');
+        const partnerStatusText = document.getElementById('partner-status-text');
+
+        if (doc.exists) {
+          const data = doc.data();
+          const isActive = data.online === true && (Date.now() - (data.lastActive || 0) < 60000);
+          isPartnerOnline = isActive;
+
+          if (isActive) {
+            if (partnerAvatarRing) partnerAvatarRing.classList.add('shadow-[0_0_15px_rgba(253,251,247,0.8)]', 'border-cream-100');
+            if (partnerOnlineDot) partnerOnlineDot.classList.remove('hidden');
+            if (partnerStatusText) {
+              partnerStatusText.textContent = "متواجد الآن في الشات ✨";
+              partnerStatusText.classList.add('text-emerald-400');
+              partnerStatusText.classList.remove('text-cream-300/70');
+            }
+          } else {
+            if (partnerAvatarRing) partnerAvatarRing.classList.remove('shadow-[0_0_15px_rgba(253,251,247,0.8)]', 'border-cream-100');
+            if (partnerOnlineDot) partnerOnlineDot.classList.add('hidden');
+            if (partnerStatusText) {
+              partnerStatusText.textContent = "غير متواجد حالياً";
+              partnerStatusText.classList.remove('text-emerald-400');
+              partnerStatusText.classList.add('text-cream-300/70');
+            }
+          }
+        }
+      });
+    }
+
+    function startPresenceHeartbeat() {
+      if (!currentUserRole) return;
+      const updatePresence = (isOnline) => {
+        db.collection("presence").doc(currentUserRole).set({
+          online: isOnline,
+          lastActive: Date.now()
+        }, { merge: true }).catch(() => {});
+      };
+
+      updatePresence(true);
+      if (presenceHeartbeatInterval) clearInterval(presenceHeartbeatInterval);
+      presenceHeartbeatInterval = setInterval(() => updatePresence(true), 15000);
+
+      window.addEventListener('beforeunload', () => updatePresence(false));
+    }
+
+    function stopPresenceHeartbeat() {
+      if (presenceHeartbeatInterval) {
+        clearInterval(presenceHeartbeatInterval);
+        presenceHeartbeatInterval = null;
       }
-      if (latestSeaLettersSnapshot) {
-        renderAllSeaLetters(latestSeaLettersSnapshot);
+      if (currentUserRole) {
+        db.collection("presence").doc(currentUserRole).set({
+          online: false,
+          lastActive: Date.now()
+        }, { merge: true }).catch(() => {});
       }
     }
 
-    window.promptAdminLogin = function() {
-      if (isAdminLoggedIn) {
-        const panel = document.getElementById('admin-panel');
-        if (panel) {
-          panel.scrollIntoView({ behavior: 'smooth' });
-        }
-        alert('أنت بالفعل داخل وضع المدير (البحر) 🌊');
+    // Chat drawer open/close
+    window.openChatDrawer = function() {
+      // Check 24-hr passcode verification in localStorage
+      const expiry = localStorage.getItem('bahr_ghym_chat_pass_expiry');
+      const isValid = expiry && parseInt(expiry, 10) > Date.now();
+
+      if (!isValid && !chatPasscodeVerified) {
+        openModal('chat-passcode-modal');
         return;
       }
-      const pin = prompt('أدخل رمز البحر السري:');
-      if (pin !== null) {
-        const normalizedInput = normalizePasscode(pin);
-        const isMatch = ADMIN_ACCEPTED_PASSCODES.some(p => normalizePasscode(p) === normalizedInput);
-        if (isMatch) {
-          sessionStorage.setItem('sea_admin_active', 'true');
-          isAdminLoggedIn = true;
-          updateAdminUI();
-          const panel = document.getElementById('admin-panel');
-          if (panel) {
-            setTimeout(() => panel.scrollIntoView({ behavior: 'smooth' }), 200);
+
+      const drawer = document.getElementById('chat-drawer');
+      if (drawer) {
+        drawer.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        startPresenceHeartbeat();
+        markPartnerMessagesAsSeen();
+        scrollChatToBottom();
+        if (window.lucide) lucide.createIcons();
+      }
+    };
+
+    window.closeChatDrawer = function() {
+      const drawer = document.getElementById('chat-drawer');
+      if (drawer) {
+        drawer.classList.add('hidden');
+        document.body.style.overflow = '';
+        stopPresenceHeartbeat();
+      }
+    };
+
+    window.handleChatPasscodeSubmit = function(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-passcode-input');
+      const errorMsg = document.getElementById('chat-passcode-error');
+      const val = (input.value || '').trim();
+
+      const matched = ACCEPTED_CHAT_PASSCODES.some(code => code === val);
+      if (matched) {
+        chatPasscodeVerified = true;
+        // Store 24-hour expiration
+        localStorage.setItem('bahr_ghym_chat_pass_expiry', (Date.now() + 24 * 3600 * 1000).toString());
+        closeModal('chat-passcode-modal');
+        input.value = '';
+        if (errorMsg) errorMsg.classList.add('hidden');
+        openChatDrawer();
+      } else {
+        if (errorMsg) {
+          errorMsg.textContent = "الرمز غير صحيح.. فكري في التاريخ الأول 🤍";
+          errorMsg.classList.remove('hidden');
+        }
+      }
+    };
+
+    // Chat messages stream & Seen indicators
+    let allChatMessages = [];
+
+    function initChatMessagesListener() {
+      db.collection("chat_messages").orderBy("createdAt", "asc").onSnapshot(snapshot => {
+        allChatMessages = [];
+        let unreadCount = 0;
+
+        snapshot.forEach(doc => {
+          const msg = { id: doc.id, ...doc.data() };
+          allChatMessages.push(msg);
+
+          if (msg.sender !== currentUserRole && msg.seen === false) {
+            unreadCount++;
           }
-          alert('أهلاً بك يا بحر.. تم تفعيل وضع الردود 🌊');
-        } else {
-          alert('رمز غير صحيح');
+        });
+
+        // Update floating badge
+        const badge = document.getElementById('chat-unread-badge');
+        if (badge) {
+          if (unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.classList.remove('hidden');
+          } else {
+            badge.classList.add('hidden');
+          }
         }
-      }
+
+        renderChatMessages();
+
+        // If drawer is open, mark seen immediately
+        const drawer = document.getElementById('chat-drawer');
+        if (drawer && !drawer.classList.contains('hidden')) {
+          markPartnerMessagesAsSeen();
+          scrollChatToBottom();
+        }
+      });
+    }
+
+    function renderChatMessages() {
+      const container = document.getElementById('chat-messages-container');
+      if (!container) return;
+
+      container.innerHTML = allChatMessages.map(msg => {
+        const isMine = (msg.sender === currentUserRole);
+        const canDelete = isMine && msg.createdAt && ((Date.now() - msg.createdAt) < 3600000);
+
+        // Seen indicator icon:
+        // Wave for bahr, Cloud for ghym.
+        const senderIcon = (msg.sender === 'bahr') ? '🌊' : '☁️';
+        const isSeen = (msg.seen === true);
+
+        return `
+          <div class="flex flex-col ${isMine ? 'items-start' : 'items-end'} group">
+            <div class="max-w-[80%] rounded-2xl px-4 py-2.5 shadow-sm text-sm ${
+              isMine 
+                ? 'bg-burgundy-800 text-cream-100 rounded-tr-none border border-cream-100/10' 
+                : 'bg-cream-100 text-burgundy-900 rounded-tl-none border border-cream-300'
+            }">
+              <p class="leading-relaxed font-cairo">${msg.text}</p>
+            </div>
+
+            <!-- Meta: Time, Seen indicator, Delete -->
+            <div class="flex items-center gap-2 mt-1 px-1 text-[10px] text-cream-300/50">
+              <span class="font-mono">${formatChatTime(msg.createdAt)}</span>
+              
+              <!-- Glowing Seen Indicator -->
+              <span class="transition-all ${isSeen ? 'text-cream-100 drop-shadow-[0_0_6px_rgba(253,251,247,0.9)] opacity-100 scale-110' : 'opacity-40 filter grayscale'}" title="${isSeen ? 'تمت الرؤية' : 'تم الإرسال'}">
+                ${senderIcon}
+              </span>
+
+              ${canDelete ? `
+                <button onclick="deleteChatMessage('${msg.id}')" class="text-red-400 hover:text-red-200 text-xs" title="حذف الرسالة">✕</button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function formatChatTime(timestamp) {
+      if (!timestamp) return '';
+      const d = new Date(timestamp);
+      let hours = d.getHours();
+      const minutes = d.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'م' : 'ص';
+      hours = hours % 12 || 12;
+      return `${hours}:${minutes} ${ampm}`;
+    }
+
+    function scrollChatToBottom() {
+      setTimeout(() => {
+        const container = document.getElementById('chat-messages-container');
+        if (container) container.scrollTop = container.scrollHeight;
+      }, 50);
+    }
+
+    function markPartnerMessagesAsSeen() {
+      allChatMessages.forEach(msg => {
+        if (msg.sender !== currentUserRole && msg.seen === false) {
+          db.collection("chat_messages").doc(msg.id).update({ seen: true }).catch(() => {});
+        }
+      });
+    }
+
+    window.handleSendChatMessage = function(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-message-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const isBahr = (currentUserRole === 'bahr');
+
+      db.collection("chat_messages").add({
+        text,
+        sender: currentUserRole || 'bahr',
+        createdAt: Date.now(),
+        seen: false
+      }).then(() => {
+        input.value = '';
+        scrollChatToBottom();
+
+        // NOTIFY HER CRITICAL CASE 3:
+        // Only if Bahr sends AND Ghym is OFFLINE!
+        if (isBahr && !isPartnerOnline) {
+          notifyGhymByEmail("البحر سابلك همسة في عالمكم 💬", "البحر سابلك همسة في عالمكم 💬");
+        }
+      }).catch(err => console.error("Send message error:", err));
     };
 
-    window.logoutAdmin = function() {
-      sessionStorage.removeItem('sea_admin_active');
-      isAdminLoggedIn = false;
-      updateAdminUI();
+    window.deleteChatMessage = function(docId) {
+      db.collection("chat_messages").doc(docId).delete().catch(err => console.error(err));
     };
 
-    window.adminAddLetter = async function() {
-      const titleInput = document.getElementById('admin-letter-title');
-      const dateInput = document.getElementById('admin-letter-date');
-      const contentInput = document.getElementById('admin-letter-content');
+    /* =====================================================================
+       14. INITIAL BOOTSTRAP ON LOAD
+       ===================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      // Initially keep scroll unlocked unless modal is active
+      document.body.style.overflow = '';
+    });
 
-      const title = titleInput.value.trim();
-      const date = dateInput.value.trim();
-      const content = contentInput.value.trim();
-
-      if (!content) {
-        alert('اكتب محتوى الرسالة أولاً');
-        return;
-      }
-
-      const arabicDate = date || new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
-
-      try {
-        await db.collection("sea_letters").add({
-          title: title || 'رسالة من البحر',
-          date: arabicDate,
-          content: content,
-          timestamp: Date.now()
-        });
-
-        titleInput.value = '';
-        dateInput.value = '';
-        contentInput.value = '';
-
-        alert('تم نشر رسالة البحر بنجاح وبشكل حي 🌊');
-      } catch (err) {
-        console.error("Firestore adminAddLetter error:", err);
-        alert('حدث خطأ أثناء نشر الرسالة: ' + (err.message || ''));
-      }
-    };
-
-    window.adminSaveReply = async function(cloudId) {
-      const replyInput = document.getElementById(`reply-input-${cloudId}`);
-      if (!replyInput) return;
-      const replyText = replyInput.value.trim();
-
-      if (!replyText) {
-        alert('اكتب الرد قبل الحفظ');
-        return;
-      }
-
-      const arabicDate = new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
-
-      try {
-        await db.collection("clouds").doc(cloudId).update({
-          reply: replyText,
-          answered: true,
-          repliedAt: arabicDate
-        });
-        alert('تم حفظ موجة الرد ونشرها مباشرة 🌊');
-      } catch (err) {
-        console.error("Firestore adminSaveReply error:", err);
-        alert('حدث خطأ أثناء حفظ الرد: ' + (err.message || ''));
-      }
-    };
-
-    window.adminDeleteLetter = async function(id) {
-      if (!confirm('هل تريد حذف رسالة البحر هذه؟')) return;
-      try {
-        await db.collection("sea_letters").doc(id).delete();
-      } catch (err) {
-        console.error("Delete letter error:", err);
-        alert('تعذر حذف الرسالة');
-      }
-    };
-
-    window.adminDeleteCloud = async function(id) {
-      if (!confirm('هل تريد حذف هذه الغيمة؟')) return;
-      try {
-        await db.collection("clouds").doc(id).delete();
-      } catch (err) {
-        console.error("Delete cloud error:", err);
-        alert('تعذر حذف الغيمة');
-      }
-    };
-
-    updateAdminUI();
-
-  })();
   </script>
-
 </body>
 </html>
