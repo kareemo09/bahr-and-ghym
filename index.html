@@ -161,6 +161,9 @@
       -webkit-user-select: none;
     }
   </style>
+
+  <!-- EmailJS SDK v4 -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body class="bg-burgundy-900 text-cream-100 font-cairo antialiased selection:bg-burgundy-500 selection:text-cream-50 overflow-x-hidden relative min-h-screen">
 
@@ -1174,43 +1177,47 @@
     }
 
     /* =====================================================================
-       6. SMART EMAIL NOTIFICATIONS TO HER (Zainabtaha938@gmail.com)
+       6. EMAILJS INITIALIZATION & UNIVERSAL NOTIFICATION DISPATCHER
        ===================================================================== */
+    if (window.emailjs) {
+      emailjs.init("hNWLBBncxP7yxnGua");
+    }
+
+    const EMAILJS_CONFIG = {
+      serviceId: "service_yaysb9p",
+      templateId: "template_039rcgt"
+    };
+
+    async function sendNotificationEmail(toEmail, subjectText, messageBody, senderName = "البحر والغيم 🌊☁️") {
+      try {
+        if (!window.emailjs) {
+          console.warn("EmailJS SDK not loaded yet");
+          return false;
+        }
+        const params = {
+          to_email: toEmail,
+          subject: subjectText,
+          message: messageBody,
+          name: senderName
+        };
+        const res = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, params);
+        console.log("Email notification sent successfully:", res.status);
+        return true;
+      } catch (err) {
+        console.error("EmailJS dispatch error:", err);
+        return false;
+      }
+    }
+
     window.notifyGhymByEmail = function(subjectText, messageBody) {
       // If partner is currently active/online in chat, DO NOT send email to avoid spam
       if (isPartnerOnline) return;
 
-      try {
-        const fd = new FormData();
-        fd.append('_subject', subjectText);
-        fd.append('_captcha', 'false');
-        fd.append('التنبيه', messageBody);
-        fd.append('المرسل', 'عالم البحر والغيم ☁️🌊');
-
-        fetch('https://formsubmit.co/Zainabtaha938@gmail.com', {
-          method: 'POST',
-          mode: 'no-cors',
-          body: fd
-        }).catch(() => console.log('Silent notification ping sent'));
-      } catch (e) {
-        console.warn('notifyGhymByEmail suppressed error:', e);
-      }
+      sendNotificationEmail("Zainabtaha938@gmail.com", subjectText, messageBody);
     };
 
     function silentAlertAdmin(subjectText, details) {
-      try {
-        const fd = new FormData();
-        fd.append('_subject', subjectText);
-        fd.append('_captcha', 'false');
-        fd.append('التفاصيل', details);
-        fd.append('التوقيت', new Date().toLocaleString('ar-EG'));
-
-        fetch('https://formsubmit.co/kareemo20333@gmail.com', {
-          method: 'POST',
-          mode: 'no-cors',
-          body: fd
-        }).catch(() => console.log('Silent admin alert ping sent'));
-      } catch(e) {}
+      sendNotificationEmail("kareemo20333@gmail.com", subjectText, details, "تنبيه نظام البحر والغيم ☁️🌊");
     }
 
     /* =====================================================================
@@ -1970,18 +1977,13 @@
           displayDate: new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
         });
 
-        // 2. Trigger Email Notification in Background (Safe & Non-blocking)
-        const formData = new FormData();
-        formData.append('_subject', isReply ? '⚠️ [مطلوب رد وتوضيح] رسالة جديدة من غيم ☁️' : '🤍 [فضفضة - اسمعني بس] رسالة جديدة من غيم ☁️');
-        formData.append('_captcha', 'false');
-        formData.append('الرسالة', messageText);
-        formData.append('نوع_الطلب', isReply ? 'عايزاك ترد وتفهمني' : 'اسمعني بس');
+        // 2. Trigger Email Notification via EmailJS
+        const emailSubject = currentResponseOption === 'reply' 
+          ? '⚠️ [مطلوب رد وتوضيح] رسالة جديدة من غيم ☁️' 
+          : '🤍 [فضفضة - اسمعني بس] رسالة جديدة من غيم ☁️';
+        const emailBody = messageText + "\n\nنوع الطلب: " + (currentResponseOption === 'reply' ? 'عايزاك ترد وتفهمني' : 'اسمعني بس');
 
-        fetch('https://formsubmit.co/kareemo20333@gmail.com', {
-          method: 'POST',
-          mode: 'no-cors',
-          body: formData
-        }).catch(() => console.log('Background email ping completed'));
+        sendNotificationEmail("kareemo20333@gmail.com", emailSubject, emailBody, "غيم ☁️");
 
         // 3. Immediate Success Feedback
         messageTextarea.value = '';
@@ -2066,7 +2068,7 @@
         document.getElementById('letter-title').value = '';
         document.getElementById('letter-content').value = '';
         // NOTIFY HER CRITICAL CASE 1:
-        notifyGhymByEmail("في موجة جديدة وصلت في صدى البحر 🌊", "في كلام جديد من البحر مستني غيمته في صدى البحر..");
+        notifyGhymByEmail("في موجة جديدة وصلت في صدى البحر 🌊", "في رسالة جديدة مستنياكي في عالمكم.. افتحي الموقع عشان تقريها بهدوء 🌊");
       }).catch(err => console.error("Letter publish error:", err));
     };
 
@@ -2184,7 +2186,7 @@
       }).then(() => {
         toggleReplyBox(cloudId);
         // NOTIFY HER CRITICAL CASE 2:
-        notifyGhymByEmail("غيمتك نزلت مطرها.. وموجة البحر ردت عليها 🌊🤍", "البحر رد بموجة جديدة على غيمتك في الموقع..");
+        notifyGhymByEmail("غيمتك نزلت مطرها.. وموجة البحر ردت عليها 🌊🤍", "البحر رد بموجة جديدة على غيمتك في الموقع.. 🌊🤍");
       }).catch(err => console.error("Save reply error:", err));
     };
 
@@ -2434,7 +2436,7 @@
         // NOTIFY HER CRITICAL CASE 3:
         // Only if Bahr sends AND Ghym is OFFLINE!
         if (isBahr && !isPartnerOnline) {
-          notifyGhymByEmail("البحر سابلك همسة في عالمكم 💬", "في رسالة شات جديدة مستنياكي في عالمكم..");
+          notifyGhymByEmail("البحر سابلك همسة في عالمكم 💬", "في رسالة شات جديدة مستنياكي في عالمكم الخاص.. 💬");
         }
       }).catch(err => console.error("Send message error:", err));
     };
@@ -2447,6 +2449,9 @@
        14. INITIAL BOOTSTRAP ON LOAD
        ===================================================================== */
     window.addEventListener('DOMContentLoaded', () => {
+      if (window.emailjs) {
+        emailjs.init("hNWLBBncxP7yxnGua");
+      }
       if (window.lucide) lucide.createIcons();
       // Initially keep scroll unlocked unless modal is active
       document.body.style.overflow = '';
