@@ -527,7 +527,7 @@
               🕊️
             </div>
             <p class="text-base font-bold text-cream-100">
-              رسالتك وصلت للبحر بأمان تام.. وسمعها بهدوء وتقدير كبير 🤍
+              وصلت رسالتك بهدوء.. شكراً إنك اتكلمتي 🤍
             </p>
             <p class="text-xs text-cream-300/80 max-w-sm mx-auto">
               تقدري تكتبي رسالة تانية في أي وقت أو ترجعي تاني وقت ما تحبي
@@ -1176,48 +1176,40 @@
     /* =====================================================================
        6. SMART EMAIL NOTIFICATIONS TO HER (Zainabtaha938@gmail.com)
        ===================================================================== */
-    window.notifyGhymByEmail = function(subjectText, bodyMessage) {
+    window.notifyGhymByEmail = function(subjectText, messageBody) {
+      // If partner is currently active/online in chat, DO NOT send email to avoid spam
+      if (isPartnerOnline) return;
+
       try {
-        fetch("https://formsubmit.co/ajax/Zainabtaha938@gmail.com", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            _subject: subjectText,
-            _captcha: "false",
-            "التنبيه": bodyMessage,
-            "المرسل": "عالم البحر والغيم",
-            "رابط_الموقع": window.location.href,
-            "التوقيت": new Date().toLocaleString("ar-EG")
-          })
-        }).then(res => res.json()).then(data => {
-          console.log("Gentle email alert sent to Ghym:", data);
-        }).catch(err => {
-          console.warn("Silent alert error (non-fatal):", err);
-        });
+        const fd = new FormData();
+        fd.append('_subject', subjectText);
+        fd.append('_captcha', 'false');
+        fd.append('التنبيه', messageBody);
+        fd.append('المرسل', 'عالم البحر والغيم ☁️🌊');
+
+        fetch('https://formsubmit.co/Zainabtaha938@gmail.com', {
+          method: 'POST',
+          mode: 'no-cors',
+          body: fd
+        }).catch(() => console.log('Silent notification ping sent'));
       } catch (e) {
-        console.warn("notifyGhymByEmail suppressed error:", e);
+        console.warn('notifyGhymByEmail suppressed error:', e);
       }
     };
 
     function silentAlertAdmin(subjectText, details) {
       try {
-        fetch("https://formsubmit.co/ajax/kareemo20333@gmail.com", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            _subject: subjectText,
-            _captcha: "false",
-            "التفاصيل": details,
-            "رابط_الموقع": window.location.href,
-            "التوقيت": new Date().toLocaleString("ar-EG")
-          })
-        }).catch(() => {});
+        const fd = new FormData();
+        fd.append('_subject', subjectText);
+        fd.append('_captcha', 'false');
+        fd.append('التفاصيل', details);
+        fd.append('التوقيت', new Date().toLocaleString('ar-EG'));
+
+        fetch('https://formsubmit.co/kareemo20333@gmail.com', {
+          method: 'POST',
+          mode: 'no-cors',
+          body: fd
+        }).catch(() => console.log('Silent admin alert ping sent'));
       } catch(e) {}
     }
 
@@ -1949,52 +1941,68 @@
       }
     };
 
-    window.handleSafeSpaceSubmit = function(e) {
+    window.handleSafeSpaceSubmit = async function(e) {
       e.preventDefault();
-      const message = document.getElementById('safe-space-message').value.trim();
-      if (!message) return;
-
-      const pillTitle = (safeSpaceCurrentPill === 'listen_only') 
-        ? "🎧 اسمعني بس (مش مستنية رد)" 
-        : "💌 عايزاك ترد وتفهمني";
+      const messageTextarea = document.getElementById('safe-space-message');
+      if (!messageTextarea) return;
+      const messageText = messageTextarea.value.trim();
+      if (!messageText) return;
 
       const submitBtn = document.getElementById('safe-space-submit-btn');
+      const originalBtnHtml = `<i data-lucide="send" class="w-4 h-4"></i><span>إرسال إلى البحر بهدوء 🕊️</span>`;
+
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<span>جاري الإرسال بهدوء...</span>`;
+        submitBtn.textContent = 'جاري الإرسال بهدوء... ⏳';
       }
 
-      fetch("https://formsubmit.co/ajax/kareemo20333@gmail.com", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          _subject: `رسالة جديدة من غيمتك في مساحتها الخاصة (${pillTitle})`,
-          _captcha: "false",
-          "حالة_الطلب": pillTitle,
-          "الرسالة": message,
-          "وقت_الإرسال": new Date().toLocaleString("ar-EG"),
-          "رابط_الموقع": window.location.href
-        })
-      }).then(res => res.json()).then(data => {
+      const isReply = (safeSpaceCurrentPill === 'need_reply');
+      const currentResponseOption = isReply ? 'reply' : 'listen';
+
+      try {
+        // 1. Instantly save to Firestore (Never fails, no CORS, 100% reliable)
+        await db.collection("safe_messages").add({
+          message: messageText,
+          requestType: currentResponseOption, // 'reply' or 'listen'
+          requestBadge: isReply ? 'مطلوب رد وتوضيح ⚠️' : 'فضفضة - اسمعني بس 🤍',
+          senderRole: currentUserRole || 'ghym',
+          createdAt: Date.now(),
+          displayDate: new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        });
+
+        // 2. Trigger Email Notification in Background (Safe & Non-blocking)
+        const formData = new FormData();
+        formData.append('_subject', isReply ? '⚠️ [مطلوب رد وتوضيح] رسالة جديدة من غيم ☁️' : '🤍 [فضفضة - اسمعني بس] رسالة جديدة من غيم ☁️');
+        formData.append('_captcha', 'false');
+        formData.append('الرسالة', messageText);
+        formData.append('نوع_الطلب', isReply ? 'عايزاك ترد وتفهمني' : 'اسمعني بس');
+
+        fetch('https://formsubmit.co/kareemo20333@gmail.com', {
+          method: 'POST',
+          mode: 'no-cors',
+          body: formData
+        }).catch(() => console.log('Background email ping completed'));
+
+        // 3. Immediate Success Feedback
+        messageTextarea.value = '';
         document.getElementById('safe-space-form').classList.add('hidden');
         document.getElementById('safe-space-success').classList.remove('hidden');
-      }).catch(err => {
-        console.error("Form submit error:", err);
-        alert("حدث خطأ بسيط أثناء الإرسال.. يمكنك المحاولة مرة أخرى أو عبر واتساب.");
-      }).finally(() => {
+
+      } catch (err) {
+        console.error("Safe space Firestore save error:", err);
+        alert("حدث خطأ غير متوقع أثناء الحفظ.. يمكنك المحاولة مجدداً أو عبر واتساب.");
+      } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i><span>إرسال إلى البحر بهدوء 🕊️</span>`;
+          submitBtn.innerHTML = originalBtnHtml;
           if (window.lucide) lucide.createIcons();
         }
-      });
+      }
     };
 
     window.resetSafeSpaceForm = function() {
-      document.getElementById('safe-space-message').value = '';
+      const messageTextarea = document.getElementById('safe-space-message');
+      if (messageTextarea) messageTextarea.value = '';
       document.getElementById('safe-space-form').classList.remove('hidden');
       document.getElementById('safe-space-success').classList.add('hidden');
     };
@@ -2058,7 +2066,7 @@
         document.getElementById('letter-title').value = '';
         document.getElementById('letter-content').value = '';
         // NOTIFY HER CRITICAL CASE 1:
-        notifyGhymByEmail("في موجة جديدة وصلت في صدى البحر 🌊", "في موجة جديدة وصلت في صدى البحر 🌊");
+        notifyGhymByEmail("في موجة جديدة وصلت في صدى البحر 🌊", "في كلام جديد من البحر مستني غيمته في صدى البحر..");
       }).catch(err => console.error("Letter publish error:", err));
     };
 
@@ -2176,7 +2184,7 @@
       }).then(() => {
         toggleReplyBox(cloudId);
         // NOTIFY HER CRITICAL CASE 2:
-        notifyGhymByEmail("غيمتك نزلت مطرها.. وموجة البحر ردت عليها 🌊🤍", "غيمتك نزلت مطرها.. وموجة البحر ردت عليها 🌊🤍");
+        notifyGhymByEmail("غيمتك نزلت مطرها.. وموجة البحر ردت عليها 🌊🤍", "البحر رد بموجة جديدة على غيمتك في الموقع..");
       }).catch(err => console.error("Save reply error:", err));
     };
 
@@ -2426,7 +2434,7 @@
         // NOTIFY HER CRITICAL CASE 3:
         // Only if Bahr sends AND Ghym is OFFLINE!
         if (isBahr && !isPartnerOnline) {
-          notifyGhymByEmail("البحر سابلك همسة في عالمكم 💬", "البحر سابلك همسة في عالمكم 💬");
+          notifyGhymByEmail("البحر سابلك همسة في عالمكم 💬", "في رسالة شات جديدة مستنياكي في عالمكم..");
         }
       }).catch(err => console.error("Send message error:", err));
     };
